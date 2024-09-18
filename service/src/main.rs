@@ -75,6 +75,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let app = Router::new()
         .route("/", post(upload_data))
+        .route("/gps", post(upload_gps_data))
         .route("/gps", get(get_gps_coords))
         .with_state((conn, buffer));
 
@@ -96,7 +97,7 @@ async fn get_gps_coords(
 ) -> (StatusCode, Json<Vec<GPSResponse>>) {
     let conn = conn.lock().await;
     let mut stmt = conn
-        .prepare("SELECT cast(payload -> '$.longitude' as float), cast(payload -> '$.latitude' as float) FROM data WHERE bucket = 'location';")
+        .prepare("SELECT cast(payload -> '$.geometry.coordinates[0]' as float), cast(payload -> '$.geometry.coordinates[1]' as float) FROM data WHERE bucket = 'location';")
         .unwrap();
 
     let response: Result<Vec<GPSResponse>, _> = stmt
@@ -112,6 +113,13 @@ async fn get_gps_coords(
     (StatusCode::OK, Json(response.unwrap()))
 }
 
+#[derive(Deserialize, Clone)]
+struct Data {
+    timestamp: Option<String>,
+    bucket: String,
+    payload: Value,
+}
+
 async fn upload_data(
     State((_, buffer)): State<StateType>,
     Json(payload): Json<Data>,
@@ -123,10 +131,57 @@ async fn upload_data(
     StatusCode::OK
 }
 
-// the input to our `create_user` handler
+#[derive(Deserialize, Serialize, Clone)]
+struct GPSProperties {
+    timestamp: String,
+    altitude: i32,
+    speed: i32,
+    horizontal_accuracy: i32,
+    vertical_accuracy: i32,
+    motion: [String; 2],
+    pauses: bool,
+    activity: String,
+    desired_accuracy: i32,
+    deferred: i32,
+    significant_change: String,
+    locations_in_payload: i32,
+    device_id: String,
+    wifi: String,
+    battery_state: String,
+    battery_level: f32,
+}
+
+#[derive(Deserialize, Serialize, Clone)]
+struct GPSGeometry {
+    r#type: String,
+    coordinates: [f64; 2],
+}
+
+#[derive(Deserialize, Serialize, Clone)]
+struct GPSLocation {
+    properties: GPSProperties,
+    r#type: String,
+    geometry: GPSGeometry,
+}
+
 #[derive(Deserialize, Clone)]
-struct Data {
-    timestamp: Option<String>,
-    bucket: String,
-    payload: Value,
+struct GPSData {
+    locations: Vec<GPSLocation>,
+}
+
+async fn upload_gps_data(
+    State((conn, _)): State<StateType>,
+    Json(payload): Json<GPSData>,
+) -> StatusCode {
+    let conn = conn.lock().await;
+    let mut stmt = conn
+        .prepare("INSERT INTO data (timestamp, bucket, payload) VALUES (?, ?, ?);")
+        .unwrap();
+    for location in payload.locations {
+        let payload: String = serde_json::to_string(&location).unwrap();
+        stmt.execute(params![location.properties.timestamp, "location", payload])
+            .unwrap();
+    }
+
+    StatusCode::OK
 }
