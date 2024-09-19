@@ -1,4 +1,4 @@
-use std::{sync::Arc, time::Duration};
+use std::sync::Arc;
 
 use axum::{
     extract::State,
@@ -10,14 +10,13 @@ use chrono::Utc;
 use duckdb::{params, Connection};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use tokio::{runtime::Handle, sync::Mutex, task};
+use tokio::sync::Mutex;
 
-type StateType = (Arc<Mutex<Connection>>, Arc<Mutex<Vec<Data>>>);
+type StateType = Arc<Mutex<Connection>>;
 
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let conn = Arc::new(Mutex::new(Connection::open("./db.duckdb")?));
-    let buffer = Arc::new(Mutex::new(Vec::new()));
 
     conn.lock().await.execute_batch(
         r"CREATE TABLE IF NOT EXISTS data (
@@ -30,55 +29,12 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Created table");
 
-    fn task(conn: Arc<Mutex<Connection>>, buffer: Arc<Mutex<Vec<Data>>>) {
-        let mut interval = tokio::time::interval(Duration::from_millis(1000));
-        loop {
-            let handle = Handle::current();
-            handle.block_on(interval.tick());
-
-            let mut buffer = handle.block_on(buffer.lock());
-
-            if buffer.len() < 1 {
-                continue;
-            }
-
-            let buffer_len = buffer.len();
-            let mut buffer_local: Vec<Data> =
-                buffer.drain(0..std::cmp::min(1000, buffer_len)).collect();
-
-            if buffer.len() == 0 {
-                buffer.shrink_to_fit();
-            }
-            // Free up lock
-            drop(buffer);
-
-            let conn = handle.block_on(conn.lock());
-            conn.execute_batch("BEGIN TRANSACTION").unwrap();
-            let mut stmt = conn
-                .prepare("INSERT INTO data (timestamp, bucket, payload) VALUES (?, ?, ?);")
-                .unwrap();
-            while let Some(p) = buffer_local.pop() {
-                stmt.execute(params![
-                    p.timestamp.unwrap_or(Utc::now().to_string()),
-                    p.bucket,
-                    p.payload.to_string(),
-                ])
-                .unwrap();
-            }
-            conn.execute_batch("COMMIT").unwrap();
-        }
-    }
-
-    let conn_clone = conn.clone();
-    let buffer_clone = buffer.clone();
-    task::spawn_blocking(move || task(conn_clone, buffer_clone));
-
     let app = Router::new()
         .route("/", post(upload_data))
         .route("/", get(get_data))
         .route("/gps", post(upload_gps_data))
         .route("/gps", get(get_gps_coords))
-        .with_state((conn, buffer));
+        .with_state(conn);
 
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
@@ -93,9 +49,7 @@ struct GPSResponse {
     latitude: f64,
 }
 
-async fn get_gps_coords(
-    State((conn, _)): State<StateType>,
-) -> (StatusCode, Json<Vec<GPSResponse>>) {
+async fn get_gps_coords(State(conn): State<StateType>) -> (StatusCode, Json<Vec<GPSResponse>>) {
     let conn = conn.lock().await;
     let mut stmt = conn
         .prepare("SELECT cast(payload -> '$.geometry.coordinates[0]' as float), cast(payload -> '$.geometry.coordinates[1]' as float) FROM data WHERE bucket = 'location';")
@@ -120,10 +74,10 @@ struct DataResponse {
     payload: String,
 }
 
-async fn get_data(State((conn, _)): State<StateType>) -> (StatusCode, Json<Vec<DataResponse>>) {
+async fn get_data(State(conn): State<StateType>) -> (StatusCode, Json<Vec<DataResponse>>) {
     let conn = conn.lock().await;
     let mut stmt = conn
-        .prepare("SELECT cast(timestamp as Text), payload FROM data;")
+        .prepare("SELECT cast(timestamp as Text), payload FROM data ORDER BY timestamp DESC;")
         .unwrap();
 
     let response: Result<Vec<DataResponse>, _> = stmt
@@ -146,13 +100,18 @@ struct Data {
     payload: Value,
 }
 
-async fn upload_data(
-    State((_, buffer)): State<StateType>,
-    Json(payload): Json<Data>,
-) -> StatusCode {
-    let mut buffer = buffer.lock().await;
-
-    buffer.push(payload);
+async fn upload_data(State(conn): State<StateType>, Json(request): Json<Data>) -> StatusCode {
+    let conn = conn.lock().await;
+    let mut stmt = conn
+        .prepare("INSERT INTO data (timestamp, bucket, payload) VALUES (?, ?, ?);")
+        .unwrap();
+    let payload = serde_json::to_string(&request.payload).unwrap();
+    stmt.execute(params![
+        request.timestamp.unwrap_or(Utc::now().to_string()),
+        request.bucket,
+        payload
+    ])
+    .unwrap();
 
     StatusCode::OK
 }
@@ -196,7 +155,7 @@ struct GPSData {
 }
 
 async fn upload_gps_data(
-    State((conn, _)): State<StateType>,
+    State(conn): State<StateType>,
     Json(payload): Json<GPSData>,
 ) -> StatusCode {
     let conn = conn.lock().await;
