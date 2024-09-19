@@ -1,0 +1,20 @@
+meta {
+  name: Post data
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{BASE_URL}}/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "bucket": "test",
+    "payload": {
+      "value": 123
+    }
+  }
+}
