@@ -75,6 +75,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let app = Router::new()
         .route("/", post(upload_data))
+        .route("/", get(get_data))
         .route("/gps", post(upload_gps_data))
         .route("/gps", get(get_gps_coords))
         .with_state((conn, buffer));
@@ -105,6 +106,31 @@ async fn get_gps_coords(
             Ok(GPSResponse {
                 longitude: row.get(0)?,
                 latitude: row.get(1)?,
+            })
+        })
+        .unwrap()
+        .collect();
+
+    (StatusCode::OK, Json(response.unwrap()))
+}
+
+#[derive(Debug, Serialize)]
+struct DataResponse {
+    timestamp: String,
+    payload: String,
+}
+
+async fn get_data(State((conn, _)): State<StateType>) -> (StatusCode, Json<Vec<DataResponse>>) {
+    let conn = conn.lock().await;
+    let mut stmt = conn
+        .prepare("SELECT cast(timestamp as Text), payload FROM data;")
+        .unwrap();
+
+    let response: Result<Vec<DataResponse>, _> = stmt
+        .query_map([], |row| {
+            Ok(DataResponse {
+                timestamp: row.get(0)?,
+                payload: row.get(1)?,
             })
         })
         .unwrap()
