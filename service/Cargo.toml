@@ -10,3 +10,5 @@ serde_json = "1.0"
 chrono = "0.4.38"
 axum = "0.7.5"
 duckdb = { version = "1.0.0", features = ["bundled"] }
+tracing-subscriber = "0.3.18"
+tracing = "0.1.40"

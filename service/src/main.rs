@@ -11,11 +11,15 @@ use duckdb::{params, Connection};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tokio::sync::Mutex;
+use tracing::info;
 
 type StateType = Arc<Mutex<Connection>>;
 
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let subscriber = tracing_subscriber::fmt().finish();
+    tracing::subscriber::set_global_default(subscriber)?;
+
     let conn = Arc::new(Mutex::new(Connection::open("./db.duckdb")?));
 
     conn.lock().await.execute_batch(
@@ -27,7 +31,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
         ",
     )?;
 
-    println!("Created table");
+    info!(message = "Created table");
 
     let app = Router::new()
         .route("/", post(upload_data))
@@ -36,8 +40,12 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/gps", get(get_gps_coords))
         .with_state(conn);
 
-    // run our app with hyper, listening globally on port 3000
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let port = 3000;
+    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))
+        .await
+        .unwrap();
+
+    info!(message = "Starting server", port);
     axum::serve(listener, app).await.unwrap();
 
     Ok(())
