@@ -6,6 +6,7 @@ use serde_json::Value;
 
 use crate::StateType;
 
+#[tracing::instrument(skip_all)]
 pub async fn get_data(State(conn): State<StateType>) -> (StatusCode, Json<Vec<DataResponse>>) {
     let conn = conn.lock().await;
     let mut stmt = conn
@@ -25,6 +26,7 @@ pub async fn get_data(State(conn): State<StateType>) -> (StatusCode, Json<Vec<Da
     (StatusCode::OK, Json(response.unwrap()))
 }
 
+#[tracing::instrument(skip_all)]
 pub async fn upload_data(State(conn): State<StateType>, Json(request): Json<Data>) -> StatusCode {
     let conn = conn.lock().await;
     let mut stmt = conn

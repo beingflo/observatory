@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::StateType;
 
+#[tracing::instrument(skip_all)]
 pub async fn upload_gps_data(
     State(conn): State<StateType>,
     Json(payload): Json<GPSData>,
@@ -21,6 +22,7 @@ pub async fn upload_gps_data(
     StatusCode::OK
 }
 
+#[tracing::instrument(skip_all)]
 pub async fn get_gps_coords(State(conn): State<StateType>) -> (StatusCode, Json<Vec<GPSResponse>>) {
     let conn = conn.lock().await;
     let mut stmt = conn

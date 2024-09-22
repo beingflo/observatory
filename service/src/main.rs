@@ -10,6 +10,7 @@ use gps::{get_gps_coords, upload_gps_data};
 use migration::apply_migrations;
 use tokio::sync::Mutex;
 use tracing::info;
+use tracing_subscriber::fmt::format::FmtSpan;
 
 mod data;
 mod gps;
@@ -19,8 +20,9 @@ type StateType = Arc<Mutex<Connection>>;
 
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let subscriber = tracing_subscriber::fmt().finish();
-    tracing::subscriber::set_global_default(subscriber)?;
+    tracing_subscriber::fmt()
+        .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
+        .init();
 
     let conn = Arc::new(Mutex::new(Connection::open("./db.duckdb")?));
 
