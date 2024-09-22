@@ -7,11 +7,13 @@ use axum::{
 use data::{get_data, upload_data};
 use duckdb::Connection;
 use gps::{get_gps_coords, upload_gps_data};
+use migration::apply_migrations;
 use tokio::sync::Mutex;
 use tracing::info;
 
 mod data;
 mod gps;
+mod migration;
 
 type StateType = Arc<Mutex<Connection>>;
 
@@ -22,16 +24,9 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let conn = Arc::new(Mutex::new(Connection::open("./db.duckdb")?));
 
-    conn.lock().await.execute_batch(
-        r"CREATE TABLE IF NOT EXISTS data (
-            timestamp TIMESTAMP NOT NULL,
-            bucket TEXT NOT NULL,
-            payload JSON NOT NULL
-          );
-        ",
-    )?;
+    info!("Opened database connection");
 
-    info!(message = "Created table");
+    apply_migrations(conn.clone()).await?;
 
     let app = Router::new()
         .route("/", post(upload_data))
