@@ -10,7 +10,9 @@ use crate::StateType;
 pub async fn get_data(State(conn): State<StateType>) -> (StatusCode, Json<Vec<DataResponse>>) {
     let conn = conn.lock().await;
     let mut stmt = conn
-        .prepare("SELECT cast(timestamp as Text), payload FROM data ORDER BY timestamp DESC;")
+        .prepare(
+            "SELECT cast(timestamp as Text), payload, bucket FROM data ORDER BY timestamp DESC;",
+        )
         .unwrap();
 
     let response: Result<Vec<DataResponse>, _> = stmt
@@ -18,6 +20,7 @@ pub async fn get_data(State(conn): State<StateType>) -> (StatusCode, Json<Vec<Da
             Ok(DataResponse {
                 timestamp: row.get(0)?,
                 payload: row.get(1)?,
+                bucket: row.get(2)?,
             })
         })
         .unwrap()
@@ -53,5 +56,6 @@ pub struct Data {
 #[derive(Debug, Serialize)]
 pub struct DataResponse {
     timestamp: String,
+    bucket: String,
     payload: String,
 }
