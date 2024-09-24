@@ -5,16 +5,16 @@ meta {
 }
 
 post {
-  url: {{BASE_URL}}/
+  url: {{BASE_URL}}/api/
   body: json
   auth: none
 }
 
 body:json {
   {
-    "bucket": "test",
+    "bucket": "weight",
     "payload": {
-      "value": 123
+      "weight": 99
     }
   }
 }
