@@ -4,4 +4,9 @@ import solidSvg from "vite-plugin-solid-svg";
 
 export default defineConfig({
   plugins: [solid(), solidSvg()],
+  server: {
+    proxy: {
+      "/api/": "http://localhost:3000",
+    },
+  },
 });
