@@ -4,6 +4,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
+use dashboards::weight::get_weight;
 use data::{get_data, upload_data};
 use duckdb::Connection;
 use gps::{get_gps_coords, upload_gps_data};
@@ -13,6 +14,7 @@ use tower_http::trace::TraceLayer;
 use tracing::info;
 use tracing_subscriber::fmt::format::FmtSpan;
 
+mod dashboards;
 mod data;
 mod gps;
 mod migration;
@@ -32,10 +34,11 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     apply_migrations(conn.clone()).await?;
 
     let app = Router::new()
-        .route("/", post(upload_data))
-        .route("/", get(get_data))
-        .route("/gps", post(upload_gps_data))
-        .route("/gps", get(get_gps_coords))
+        .route("/api/", post(upload_data))
+        .route("/api/", get(get_data))
+        .route("/api/weight", get(get_weight))
+        .route("/api/gps", post(upload_gps_data))
+        .route("/api/gps", get(get_gps_coords))
         .layer(TraceLayer::new_for_http())
         .with_state(conn);
 
