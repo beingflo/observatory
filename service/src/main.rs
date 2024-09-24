@@ -9,6 +9,7 @@ use duckdb::Connection;
 use gps::{get_gps_coords, upload_gps_data};
 use migration::apply_migrations;
 use tokio::sync::Mutex;
+use tower_http::trace::TraceLayer;
 use tracing::info;
 use tracing_subscriber::fmt::format::FmtSpan;
 
@@ -35,6 +36,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/", get(get_data))
         .route("/gps", post(upload_gps_data))
         .route("/gps", get(get_gps_coords))
+        .layer(TraceLayer::new_for_http())
         .with_state(conn);
 
     let port = 3000;
