@@ -1,18 +1,30 @@
-FROM node:alpine as ui-builder
-WORKDIR /usr/src/observable/ui
+FROM node:alpine AS ui-builder
+WORKDIR /usr/src/observatory/ui
+
 COPY ui/package.json ui/package-lock.json ./
+
 RUN npm install
 COPY ./ui/ ./
 RUN npm run build
-CMD ["npm", "run", "dev", "--", "--host"]
 
+FROM rust:1.81 AS chef 
+RUN cargo install cargo-chef 
+WORKDIR /usr/src/observatory/service
 
-# FROM rust:1.81 as service-builder
-# WORKDIR /usr/src/observable/service
-# COPY ./service .
-# RUN cargo build --release
+FROM chef AS planner
+COPY ./service .
+RUN cargo chef prepare --recipe-path recipe.json
 
-# FROM debian:bullseye-slim
+FROM chef AS builder
+COPY --from=planner /usr/src/observatory/service/recipe.json recipe.json
 
-# COPY --from=service-builder /usr/local/cargo/bin/observable /usr/local/bin/observable
-# CMD ["observable"]
+RUN cargo chef cook --release --recipe-path recipe.json
+
+COPY ./service .
+RUN cargo build --release --bin observatory 
+
+FROM debian:bookworm-slim AS runtime
+
+WORKDIR /usr/src/observatory/service
+COPY --from=builder /usr/src/observatory/service/target/release/observatory /usr/local/bin
+ENTRYPOINT ["/usr/local/bin/observatory"]
