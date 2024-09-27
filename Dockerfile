@@ -21,6 +21,7 @@ COPY --from=planner /usr/src/observatory/service/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 
 COPY ./service .
+COPY --from=ui-builder /usr/src/observatory/ui/dist ./ui
 RUN cargo build --release --bin observatory 
 
 FROM debian:bookworm-slim AS runtime
