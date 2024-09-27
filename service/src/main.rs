@@ -9,6 +9,7 @@ use data::{get_data, upload_data};
 use duckdb::Connection;
 use gps::{get_gps_coords, upload_gps_data};
 use migration::apply_migrations;
+use spa::static_handler;
 use tokio::sync::Mutex;
 use tower_http::trace::TraceLayer;
 use tracing::info;
@@ -18,6 +19,7 @@ mod dashboards;
 mod data;
 mod gps;
 mod migration;
+mod spa;
 
 type StateType = Arc<Mutex<Connection>>;
 
@@ -39,6 +41,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/api/weight", get(get_weight))
         .route("/api/gps", post(upload_gps_data))
         .route("/api/gps", get(get_gps_coords))
+        .fallback(static_handler)
         .layer(TraceLayer::new_for_http())
         .with_state(conn);
 
