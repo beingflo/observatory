@@ -8,7 +8,7 @@ use crate::StateType;
 pub async fn upload_gps_data(
     State(conn): State<StateType>,
     Json(payload): Json<GPSData>,
-) -> StatusCode {
+) -> Json<GPSUploadResponse> {
     let conn = conn.lock().await;
     let mut stmt = conn
         .prepare("INSERT INTO data (timestamp, bucket, payload) VALUES (?, ?, ?);")
@@ -19,7 +19,9 @@ pub async fn upload_gps_data(
             .unwrap();
     }
 
-    StatusCode::OK
+    Json(GPSUploadResponse {
+        result: "ok".into(),
+    })
 }
 
 #[tracing::instrument(skip_all)]
@@ -40,6 +42,11 @@ pub async fn get_gps_coords(State(conn): State<StateType>) -> (StatusCode, Json<
         .collect();
 
     (StatusCode::OK, Json(response.unwrap()))
+}
+
+#[derive(Debug, Serialize)]
+pub struct GPSUploadResponse {
+    result: String,
 }
 
 #[derive(Debug, Serialize)]
