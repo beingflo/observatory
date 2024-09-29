@@ -1,0 +1,21 @@
+meta {
+  name: Post data (timestamp)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{BASE_URL}}/api/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "bucket": "weight",
+    "timestamp": "2021-09-29 10:21:37.22698",
+    "payload": {
+      "weight": 99
+    }
+  }
+}
