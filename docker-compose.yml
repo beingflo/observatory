@@ -1,16 +1,9 @@
-version: "3.3"
 services:
-  metis:
-    image: "ghcr.io/beingflo/observatory:latest"
+  observatory:
+    image: "observatory:latest"
     container_name: observatory
     ports:
       - 3000:3000
     volumes:
-      - ./db:/usr/src/app/db/
+      - ./db/:/usr/src/app/db/
     restart: unless-stopped
-    networks:
-      - caddy_net
-
-networks:
-  caddy_net:
-    external: true

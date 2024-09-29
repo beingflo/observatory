@@ -29,7 +29,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
         .init();
 
-    let conn = Arc::new(Mutex::new(Connection::open("./db.duckdb")?));
+    let conn = Arc::new(Mutex::new(Connection::open("./db/db.duckdb")?));
 
     info!("Opened database connection");
 

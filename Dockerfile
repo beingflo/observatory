@@ -26,6 +26,6 @@ RUN cargo build --release --bin observatory
 
 FROM debian:bookworm-slim AS runtime
 
-WORKDIR /usr/src/observatory/service
+WORKDIR /usr/src/app/
 COPY --from=builder /usr/src/observatory/service/target/release/observatory /usr/src/app/
 ENTRYPOINT ["/usr/src/app/observatory"]
