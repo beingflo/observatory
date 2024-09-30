@@ -28,5 +28,5 @@ pub async fn get_weight(State(conn): State<StateType>) -> (StatusCode, Json<Vec<
 #[derive(Debug, Serialize)]
 pub struct Weight {
     timestamp: String,
-    weight: i32,
+    weight: f32,
 }
