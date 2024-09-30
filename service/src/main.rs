@@ -10,7 +10,7 @@ use duckdb::Connection;
 use gps::{get_gps_coords, upload_gps_data};
 use migration::apply_migrations;
 use spa::static_handler;
-use tokio::sync::Mutex;
+use tokio::{signal, sync::Mutex};
 use tower_http::trace::TraceLayer;
 use tracing::info;
 use tracing_subscriber::fmt::format::FmtSpan;
@@ -51,7 +51,35 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap();
 
     info!(message = "Starting server", port);
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal())
+        .await
+        .unwrap();
 
     Ok(())
+}
+
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("Failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("Failed to install SIGTERM handler")
+            .recv()
+            .await;
+    };
+
+    tokio::select! {
+        _ = ctrl_c => {
+            info!("Ctrl+C received, shutting down")
+        },
+        _ = terminate => {
+            info!("SIGTERM received, shutting down")
+        },
+    }
 }
