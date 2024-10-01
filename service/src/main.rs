@@ -1,6 +1,8 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use axum::{
+    body::Body,
+    http::{Request, Response},
     routing::{get, post},
     Router,
 };
@@ -11,9 +13,10 @@ use gps::{get_gps_coords, upload_gps_data};
 use migration::apply_migrations;
 use spa::static_handler;
 use tokio::{signal, sync::Mutex};
-use tower_http::trace::TraceLayer;
-use tracing::info;
+use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
+use tracing::{info, Span};
 use tracing_subscriber::fmt::format::FmtSpan;
+use uuid::Uuid;
 
 mod dashboards;
 mod data;
@@ -42,7 +45,26 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/api/gps", post(upload_gps_data))
         .route("/api/gps", get(get_gps_coords))
         .fallback(static_handler)
-        .layer(TraceLayer::new_for_http())
+        .layer(
+            TraceLayer::new_for_http()
+                .make_span_with(|_request: &Request<Body>| {
+                    let request_id = Uuid::new_v4().to_string();
+                    tracing::info_span!("http-request", %request_id)
+                })
+                .on_request(|request: &Request<Body>, _span: &Span| {
+                    tracing::info!("request: {} {}", request.method(), request.uri().path())
+                })
+                .on_response(
+                    |response: &Response<Body>, latency: Duration, _span: &Span| {
+                        tracing::info!("response: {} {:?}", response.status(), latency,)
+                    },
+                )
+                .on_failure(
+                    |error: ServerErrorsFailureClass, _latency: Duration, _span: &Span| {
+                        tracing::error!("error: {}", error)
+                    },
+                ),
+        )
         .with_state(conn);
 
     let port = 3000;
