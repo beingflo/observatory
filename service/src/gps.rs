@@ -1,6 +1,8 @@
 use axum::{extract::State, http::StatusCode, Json};
+use chrono::{DateTime, Utc};
 use duckdb::params;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 use crate::StateType;
 
@@ -15,7 +17,15 @@ pub async fn upload_gps_data(
         .unwrap();
     for location in payload.locations {
         let payload: String = serde_json::to_string(&location).unwrap();
-        stmt.execute(params![location.properties.timestamp, "location", payload])
+        let timestamp: String = match location.properties["timestamp"].as_str() {
+            Some(ts) => DateTime::parse_from_rfc3339(ts)
+                .unwrap()
+                .naive_utc()
+                .to_string(),
+            None => Utc::now().to_string(),
+        };
+
+        stmt.execute(params![timestamp, "location", payload])
             .unwrap();
     }
 
@@ -56,26 +66,6 @@ pub struct GPSResponse {
 }
 
 #[derive(Deserialize, Serialize, Clone)]
-struct GPSProperties {
-    timestamp: String,
-    altitude: i32,
-    speed: i32,
-    horizontal_accuracy: i32,
-    vertical_accuracy: i32,
-    motion: [String; 2],
-    pauses: bool,
-    activity: String,
-    desired_accuracy: i32,
-    deferred: i32,
-    significant_change: String,
-    locations_in_payload: i32,
-    device_id: String,
-    wifi: String,
-    battery_state: String,
-    battery_level: f32,
-}
-
-#[derive(Deserialize, Serialize, Clone)]
 struct GPSGeometry {
     r#type: String,
     coordinates: [f64; 2],
@@ -83,7 +73,7 @@ struct GPSGeometry {
 
 #[derive(Deserialize, Serialize, Clone)]
 struct GPSLocation {
-    properties: GPSProperties,
+    properties: Value,
     r#type: String,
     geometry: GPSGeometry,
 }
