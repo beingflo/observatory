@@ -1,4 +1,8 @@
-use axum::{extract::State, http::StatusCode, Json};
+use axum::{
+    extract::{Query, State},
+    http::StatusCode,
+    Json,
+};
 use chrono::Utc;
 use duckdb::params;
 use serde::{Deserialize, Serialize};
@@ -6,8 +10,19 @@ use serde_json::Value;
 
 use crate::StateType;
 
+#[derive(Deserialize)]
+pub struct DataFilters {
+    from: Option<String>,
+    to: Option<String>,
+    limit: Option<u32>,
+    bucket: Option<String>,
+}
+
 #[tracing::instrument(skip_all)]
-pub async fn get_data(State(conn): State<StateType>) -> (StatusCode, Json<Vec<DataResponse>>) {
+pub async fn get_data(
+    State(conn): State<StateType>,
+    Query(filters): Query<DataFilters>,
+) -> (StatusCode, Json<Vec<DataResponse>>) {
     let conn = conn.lock().await;
     let mut stmt = conn
         .prepare(
