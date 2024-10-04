@@ -39,8 +39,8 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     apply_migrations(conn.clone()).await?;
 
     let app = Router::new()
-        .route("/api", post(upload_data))
-        .route("/api", get(get_data))
+        .route("/api/data", post(upload_data))
+        .route("/api/data", get(get_data))
         .route("/api/weight", get(get_weight))
         .route("/api/gps", post(upload_gps_data))
         .route("/api/gps", get(get_gps_coords))
