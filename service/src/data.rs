@@ -34,15 +34,17 @@ pub async fn get_data(
             .to_rfc3339(),
     );
 
+    let limit = filters.limit.unwrap_or(100);
+
     let conn = conn.lock().await;
     let mut stmt = conn
         .prepare(
-            "SELECT cast(timestamp as Text), payload, bucket FROM data WHERE bucket = (?) AND timestamp > (?) AND timestamp < (?) ORDER BY timestamp DESC;",
+            "SELECT cast(timestamp as Text), payload, bucket FROM data WHERE bucket = (?) AND timestamp > (?) AND timestamp < (?) ORDER BY timestamp DESC LIMIT (?);",
         )
         .unwrap();
 
     let response: Result<Vec<DataResponse>, _> = stmt
-        .query_map(params![filters.bucket, from, to], |row| {
+        .query_map(params![filters.bucket, from, to, limit], |row| {
             Ok(DataResponse {
                 timestamp: row.get(0)?,
                 payload: row.get(1)?,
