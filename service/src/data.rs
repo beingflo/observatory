@@ -37,14 +37,15 @@ pub async fn get_data(
     let limit = filters.limit.unwrap_or(100);
 
     let conn = conn.lock().await;
-    let mut stmt = conn
+    let mut stmt;
+
+    let response: Result<Vec<DataResponse>, _> = if filters.bucket.is_some() {
+        stmt = conn
         .prepare(
             "SELECT cast(timestamp as Text), payload, bucket FROM data WHERE bucket = (?) AND timestamp > (?) AND timestamp < (?) ORDER BY timestamp DESC LIMIT (?);",
         )
         .unwrap();
-
-    let response: Result<Vec<DataResponse>, _> = stmt
-        .query_map(params![filters.bucket, from, to, limit], |row| {
+        stmt.query_map(params![filters.bucket, from, to, limit], |row| {
             Ok(DataResponse {
                 timestamp: row.get(0)?,
                 payload: row.get(1)?,
@@ -52,7 +53,23 @@ pub async fn get_data(
             })
         })
         .unwrap()
-        .collect();
+        .collect()
+    } else {
+        stmt = conn
+        .prepare(
+            "SELECT cast(timestamp as Text), payload, bucket FROM data WHERE timestamp > (?) AND timestamp < (?) ORDER BY timestamp DESC LIMIT (?);",
+        )
+        .unwrap();
+        stmt.query_map(params![from, to, limit], |row| {
+            Ok(DataResponse {
+                timestamp: row.get(0)?,
+                payload: row.get(1)?,
+                bucket: row.get(2)?,
+            })
+        })
+        .unwrap()
+        .collect()
+    };
 
     (StatusCode::OK, Json(response.unwrap()))
 }
