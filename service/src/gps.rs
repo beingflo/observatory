@@ -1,5 +1,4 @@
 use axum::{extract::State, http::StatusCode, Json};
-use chrono::{DateTime, Utc};
 use duckdb::params;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -17,13 +16,7 @@ pub async fn upload_gps_data(
         .unwrap();
     for location in payload.locations {
         let payload: String = serde_json::to_string(&location).unwrap();
-        let timestamp: String = match location.properties["timestamp"].as_str() {
-            Some(ts) => DateTime::parse_from_rfc3339(ts)
-                .unwrap()
-                .naive_utc()
-                .to_string(),
-            None => Utc::now().to_string(),
-        };
+        let timestamp = location.properties["timestamp"].as_str().unwrap();
 
         stmt.execute(params![timestamp, "location", payload])
             .unwrap();
