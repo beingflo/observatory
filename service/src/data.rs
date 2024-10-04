@@ -3,7 +3,7 @@ use axum::{
     http::StatusCode,
     Json,
 };
-use chrono::Utc;
+use chrono::{DateTime, Months, Utc};
 use duckdb::params;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -23,15 +23,26 @@ pub async fn get_data(
     State(conn): State<StateType>,
     Query(filters): Query<DataFilters>,
 ) -> (StatusCode, Json<Vec<DataResponse>>) {
+    let from = filters
+        .from
+        .unwrap_or(DateTime::from_timestamp_nanos(0).to_rfc3339());
+
+    let to = filters.to.unwrap_or(
+        DateTime::from_timestamp_nanos(0)
+            .checked_add_months(Months::new(12_000))
+            .unwrap()
+            .to_rfc3339(),
+    );
+
     let conn = conn.lock().await;
     let mut stmt = conn
         .prepare(
-            "SELECT cast(timestamp as Text), payload, bucket FROM data ORDER BY timestamp DESC;",
+            "SELECT cast(timestamp as Text), payload, bucket FROM data WHERE bucket = (?) AND timestamp > (?) AND timestamp < (?) ORDER BY timestamp DESC;",
         )
         .unwrap();
 
     let response: Result<Vec<DataResponse>, _> = stmt
-        .query_map([], |row| {
+        .query_map(params![filters.bucket, from, to], |row| {
             Ok(DataResponse {
                 timestamp: row.get(0)?,
                 payload: row.get(1)?,
