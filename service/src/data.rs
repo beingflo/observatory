@@ -3,7 +3,7 @@ use axum::{
     http::StatusCode,
     Json,
 };
-use chrono::{DateTime, Months, Utc};
+use chrono::{DateTime, Days, Months, Utc};
 use duckdb::params;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -14,6 +14,7 @@ use crate::StateType;
 pub struct DataFilters {
     from: Option<String>,
     to: Option<String>,
+    past_days: Option<u32>,
     limit: Option<u32>,
     bucket: Option<String>,
 }
@@ -23,16 +24,24 @@ pub async fn get_data(
     State(conn): State<StateType>,
     Query(filters): Query<DataFilters>,
 ) -> (StatusCode, Json<Vec<DataResponse>>) {
-    let from = filters
+    let mut from = filters
         .from
         .unwrap_or(DateTime::from_timestamp_nanos(0).to_rfc3339());
 
-    let to = filters.to.unwrap_or(
+    let mut to = filters.to.unwrap_or(
         DateTime::from_timestamp_nanos(0)
             .checked_add_months(Months::new(12_000))
             .unwrap()
             .to_rfc3339(),
     );
+
+    if filters.past_days.is_some() {
+        to = Utc::now().to_rfc3339();
+        from = Utc::now()
+            .checked_sub_days(Days::new(filters.past_days.unwrap() as u64))
+            .unwrap()
+            .to_rfc3339();
+    }
 
     let limit = filters.limit.unwrap_or(100);
 
