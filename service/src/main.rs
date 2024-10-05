@@ -3,11 +3,11 @@ use std::{sync::Arc, time::Duration};
 use axum::{
     body::Body,
     http::{Request, Response},
-    routing::{get, post},
+    routing::{delete, get, post},
     Router,
 };
 use dashboards::weight::get_weight;
-use data::{get_data, upload_data};
+use data::{delete_data, get_data, upload_data};
 use duckdb::Connection;
 use gps::{get_gps_coords, upload_gps_data};
 use migration::apply_migrations;
@@ -41,6 +41,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let app = Router::new()
         .route("/api/data", post(upload_data))
         .route("/api/data", get(get_data))
+        .route("/api/data", delete(delete_data))
         .route("/api/weight", get(get_weight))
         .route("/api/gps", post(upload_gps_data))
         .route("/api/gps", get(get_gps_coords))
