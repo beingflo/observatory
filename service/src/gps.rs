@@ -28,10 +28,10 @@ pub async fn upload_gps_data(
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn get_gps_coords(State(conn): State<StateType>) -> (StatusCode, Json<Vec<GPSResponse>>) {
+pub async fn get_gps_coords(State(conn): State<StateType>) -> (StatusCode, String) {
     let conn = conn.lock().await;
     let mut stmt = conn
-        .prepare("SELECT cast(payload -> '$.geometry.coordinates[0]' as float), cast(payload -> '$.geometry.coordinates[1]' as float) FROM data WHERE bucket = 'location';")
+        .prepare("SELECT cast(payload -> '$.geometry.coordinates[0]' as float), cast(payload -> '$.geometry.coordinates[1]' as float) FROM data WHERE bucket = 'location' ORDER BY timestamp DESC;")
         .unwrap();
 
     let response: Result<Vec<GPSResponse>, _> = stmt
@@ -44,7 +44,15 @@ pub async fn get_gps_coords(State(conn): State<StateType>) -> (StatusCode, Json<
         .unwrap()
         .collect();
 
-    (StatusCode::OK, Json(response.unwrap()))
+    (
+        StatusCode::OK,
+        response
+            .unwrap()
+            .into_iter()
+            .map(|r| format!("{}, {}", r.latitude, r.longitude))
+            .collect::<Vec<String>>()
+            .join("\n"),
+    )
 }
 
 #[derive(Debug, Serialize)]
