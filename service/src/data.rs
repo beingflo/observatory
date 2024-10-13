@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use axum::{
     extract::{Query, State},
     http::StatusCode,
@@ -16,9 +18,17 @@ pub async fn get_data(
     State(conn): State<StateType>,
     Query(filters): Query<GetDataFilters>,
 ) -> (StatusCode, Json<Vec<DataResponse>>) {
-    let mut from = filters.from.unwrap_or(Timestamp::MIN.to_string());
+    let mut from = if let Some(f) = filters.from {
+        Timestamp::from_str(&f).unwrap().to_string()
+    } else {
+        Timestamp::MIN.to_string()
+    };
 
-    let mut to = filters.to.unwrap_or(Timestamp::MAX.to_string());
+    let mut to = if let Some(t) = filters.to {
+        Timestamp::from_str(&t).unwrap().to_string()
+    } else {
+        Timestamp::MAX.to_string()
+    };
 
     if filters.past_days.is_some() {
         to = Timestamp::now().to_string();
@@ -41,8 +51,9 @@ pub async fn get_data(
         )
         .unwrap();
         stmt.query_map(params![filters.bucket, from, to, limit], |row| {
+            let date_utc: String = row.get(0)?;
             Ok(DataResponse {
-                timestamp: row.get(0)?,
+                timestamp: Timestamp::from_str(&date_utc).unwrap().to_string(),
                 payload: row.get(1)?,
                 bucket: row.get(2)?,
             })
@@ -56,8 +67,9 @@ pub async fn get_data(
         )
         .unwrap();
         stmt.query_map(params![from, to, limit], |row| {
+            let date_utc: String = row.get(0)?;
             Ok(DataResponse {
-                timestamp: row.get(0)?,
+                timestamp: Timestamp::from_str(&date_utc).unwrap().to_string(),
                 payload: row.get(1)?,
                 bucket: row.get(2)?,
             })
@@ -74,9 +86,17 @@ pub async fn delete_data(
     State(conn): State<StateType>,
     Query(filters): Query<DeleteDataFilters>,
 ) -> (StatusCode, Json<DataDeleteResponse>) {
-    let mut from = filters.from.unwrap_or(Timestamp::MIN.to_string());
+    let mut from = if let Some(f) = filters.from {
+        Timestamp::from_str(&f).unwrap().to_string()
+    } else {
+        Timestamp::MIN.to_string()
+    };
 
-    let mut to = filters.to.unwrap_or(Timestamp::MAX.to_string());
+    let mut to = if let Some(t) = filters.to {
+        Timestamp::from_str(&t).unwrap().to_string()
+    } else {
+        Timestamp::MAX.to_string()
+    };
 
     if filters.past_days.is_some() {
         to = Timestamp::now().to_string();
