@@ -3,8 +3,8 @@ use axum::{
     http::StatusCode,
     Json,
 };
-use chrono::{DateTime, Days, Months, Utc};
 use duckdb::params;
+use jiff::{Span, Timestamp, Zoned};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tracing::info;
@@ -16,23 +16,17 @@ pub async fn get_data(
     State(conn): State<StateType>,
     Query(filters): Query<GetDataFilters>,
 ) -> (StatusCode, Json<Vec<DataResponse>>) {
-    let mut from = filters
-        .from
-        .unwrap_or(DateTime::from_timestamp_nanos(0).to_rfc3339());
+    let mut from = filters.from.unwrap_or(Timestamp::MIN.to_string());
 
-    let mut to = filters.to.unwrap_or(
-        DateTime::from_timestamp_nanos(0)
-            .checked_add_months(Months::new(12_000))
-            .unwrap()
-            .to_rfc3339(),
-    );
+    let mut to = filters.to.unwrap_or(Timestamp::MAX.to_string());
 
     if filters.past_days.is_some() {
-        to = Utc::now().to_rfc3339();
-        from = Utc::now()
-            .checked_sub_days(Days::new(filters.past_days.unwrap() as u64))
+        to = Timestamp::now().to_string();
+        from = Zoned::now()
+            .checked_sub(Span::new().days(filters.past_days.unwrap()))
             .unwrap()
-            .to_rfc3339();
+            .timestamp()
+            .to_string();
     }
 
     let limit = filters.limit.unwrap_or(100);
@@ -80,23 +74,17 @@ pub async fn delete_data(
     State(conn): State<StateType>,
     Query(filters): Query<DeleteDataFilters>,
 ) -> (StatusCode, Json<DataDeleteResponse>) {
-    let mut from = filters
-        .from
-        .unwrap_or(DateTime::from_timestamp_nanos(0).to_rfc3339());
+    let mut from = filters.from.unwrap_or(Timestamp::MIN.to_string());
 
-    let mut to = filters.to.unwrap_or(
-        DateTime::from_timestamp_nanos(0)
-            .checked_add_months(Months::new(12_000))
-            .unwrap()
-            .to_rfc3339(),
-    );
+    let mut to = filters.to.unwrap_or(Timestamp::MAX.to_string());
 
     if filters.past_days.is_some() {
-        to = Utc::now().to_rfc3339();
-        from = Utc::now()
-            .checked_sub_days(Days::new(filters.past_days.unwrap() as u64))
+        to = Timestamp::now().to_string();
+        from = Zoned::now()
+            .checked_sub(Span::new().days(filters.past_days.unwrap()))
             .unwrap()
-            .to_rfc3339();
+            .timestamp()
+            .to_string();
     }
 
     let conn = conn.lock().await;
@@ -131,7 +119,7 @@ pub async fn upload_data(State(conn): State<StateType>, Json(request): Json<Data
         .unwrap();
     let payload = serde_json::to_string(&request.payload).unwrap();
     stmt.execute(params![
-        request.timestamp.unwrap_or(Utc::now().to_string()),
+        request.timestamp.unwrap_or(Timestamp::now().to_string()),
         request.bucket,
         payload
     ])
