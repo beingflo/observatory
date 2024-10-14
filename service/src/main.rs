@@ -2,7 +2,7 @@ use std::{sync::Arc, time::Duration};
 
 use axum::{
     body::Body,
-    http::{Request, Response},
+    http::{Request, Response, StatusCode},
     routing::{delete, get, post},
     Router,
 };
@@ -15,7 +15,7 @@ use migration::apply_migrations;
 use spa::static_handler;
 use tokio::{signal, sync::Mutex};
 use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
-use tracing::{info, Span};
+use tracing::{error, info, Span};
 use tracing_subscriber::fmt::format::FmtSpan;
 use uuid::Uuid;
 
@@ -73,13 +73,19 @@ pub async fn main() -> Result<(), AppError> {
     let port = 3000;
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))
         .await
-        .unwrap();
+        .map_err(|e| {
+            error!(message = "Failed to create TCP listener", error=%e);
+            AppError::Status(StatusCode::SERVICE_UNAVAILABLE)
+        })?;
 
     info!(message = "Starting server", port);
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
         .await
-        .unwrap();
+        .map_err(|e| {
+            error!(message = "Failed to start server", error=%e);
+            AppError::Status(StatusCode::SERVICE_UNAVAILABLE)
+        })?;
 
     Ok(())
 }

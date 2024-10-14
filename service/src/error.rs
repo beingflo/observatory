@@ -10,7 +10,9 @@ pub enum AppError {
     #[error("Status code {0}")]
     Status(StatusCode),
     #[error("Date parse code {0}")]
-    DateError(jiff::Error),
+    DateInputError(jiff::Error),
+    #[error("Date parse code {0}")]
+    DateError(#[from] jiff::Error),
     #[error("DB error {0}")]
     DBError(#[from] duckdb::Error),
     #[error("Serde error {0}")]
@@ -23,6 +25,9 @@ impl IntoResponse for AppError {
 
         match self {
             AppError::Status(code) => code.into_response(),
+            AppError::DateInputError(error) => {
+                (StatusCode::BAD_REQUEST, error.to_string()).into_response()
+            }
             AppError::DateError(error) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, error.to_string()).into_response()
             }

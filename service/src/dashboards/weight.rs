@@ -10,7 +10,7 @@ pub async fn get_weight(
     let conn = conn.lock().await;
     let mut stmt = conn
         .prepare(
-            "SELECT cast(timestamp as Text), payload -> '$.weight' FROM data WHERE bucket = 'weight' ORDER BY timestamp DESC;",
+            "SELECT cast(timestamp as Text), payload -> '$.weight' FROM timeseries WHERE bucket = 'weight' ORDER BY timestamp DESC;",
         )?;
 
     let response: Result<Vec<Weight>, _> = stmt
@@ -22,7 +22,7 @@ pub async fn get_weight(
         })?
         .collect();
 
-    Ok((StatusCode::OK, Json(response.unwrap())))
+    Ok((StatusCode::OK, Json(response?)))
 }
 
 #[derive(Debug, Serialize)]

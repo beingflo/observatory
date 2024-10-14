@@ -19,22 +19,25 @@ pub async fn get_data(
     Query(filters): Query<GetDataFilters>,
 ) -> Result<(StatusCode, Json<Vec<DataResponse>>), AppError> {
     let mut from = if let Some(f) = filters.from {
-        Timestamp::from_str(&f).unwrap().to_string()
+        Timestamp::from_str(&f)
+            .map_err(|e| AppError::DateInputError(e))?
+            .to_string()
     } else {
         Timestamp::MIN.to_string()
     };
 
     let mut to = if let Some(t) = filters.to {
-        Timestamp::from_str(&t).unwrap().to_string()
+        Timestamp::from_str(&t)
+            .map_err(|e| AppError::DateInputError(e))?
+            .to_string()
     } else {
         Timestamp::MAX.to_string()
     };
 
-    if filters.past_days.is_some() {
+    if let Some(past_days) = filters.past_days {
         to = Timestamp::now().to_string();
         from = Zoned::now()
-            .checked_sub(Span::new().days(filters.past_days.unwrap()))
-            .unwrap()
+            .checked_sub(Span::new().days(past_days))?
             .timestamp()
             .to_string();
     }
@@ -44,12 +47,12 @@ pub async fn get_data(
     let conn = conn.lock().await;
     let mut stmt;
 
-    let response: Result<Vec<DataResponse>, _> = if filters.bucket.is_some() {
+    let response: Result<Vec<DataResponse>, _> = if let Some(bucket) = filters.bucket {
         stmt = conn
         .prepare(
-            "SELECT cast(timestamp as Text), payload, bucket FROM data WHERE bucket = (?) AND timestamp > (?) AND timestamp < (?) ORDER BY timestamp DESC LIMIT (?);",
+            "SELECT cast(timestamp as Text), payload, bucket FROM timeseries WHERE bucket = (?) AND timestamp > (?) AND timestamp < (?) ORDER BY timestamp DESC LIMIT (?);",
         )?;
-        stmt.query_map(params![filters.bucket, from, to, limit], |row| {
+        stmt.query_map(params![bucket, from, to, limit], |row| {
             let date_utc: String = row.get(0)?;
             Ok(DataResponse {
                 timestamp: Timestamp::from_str(&date_utc).unwrap().to_string(),
@@ -61,7 +64,7 @@ pub async fn get_data(
     } else {
         stmt = conn
         .prepare(
-            "SELECT cast(timestamp as Text), payload, bucket FROM data WHERE timestamp > (?) AND timestamp < (?) ORDER BY timestamp DESC LIMIT (?);",
+            "SELECT cast(timestamp as Text), payload, bucket FROM timeseries WHERE timestamp > (?) AND timestamp < (?) ORDER BY timestamp DESC LIMIT (?);",
         )?;
         stmt.query_map(params![from, to, limit], |row| {
             let date_utc: String = row.get(0)?;
@@ -74,7 +77,7 @@ pub async fn get_data(
         .collect()
     };
 
-    Ok((StatusCode::OK, Json(response.unwrap())))
+    Ok((StatusCode::OK, Json(response?)))
 }
 
 #[tracing::instrument(skip_all)]
@@ -83,22 +86,25 @@ pub async fn delete_data(
     Query(filters): Query<DeleteDataFilters>,
 ) -> Result<(StatusCode, Json<DataDeleteResponse>), AppError> {
     let mut from = if let Some(f) = filters.from {
-        Timestamp::from_str(&f).unwrap().to_string()
+        Timestamp::from_str(&f)
+            .map_err(|e| AppError::DateInputError(e))?
+            .to_string()
     } else {
         Timestamp::MIN.to_string()
     };
 
     let mut to = if let Some(t) = filters.to {
-        Timestamp::from_str(&t).unwrap().to_string()
+        Timestamp::from_str(&t)
+            .map_err(|e| AppError::DateInputError(e))?
+            .to_string()
     } else {
         Timestamp::MAX.to_string()
     };
 
-    if filters.past_days.is_some() {
+    if let Some(past_days) = filters.past_days {
         to = Timestamp::now().to_string();
         from = Zoned::now()
-            .checked_sub(Span::new().days(filters.past_days.unwrap()))
-            .unwrap()
+            .checked_sub(Span::new().days(past_days))?
             .timestamp()
             .to_string();
     }
@@ -106,14 +112,14 @@ pub async fn delete_data(
     let conn = conn.lock().await;
     let affected_rows;
 
-    if filters.bucket.is_some() {
+    if let Some(bucket) = filters.bucket {
         affected_rows = conn.execute(
-            "DELETE FROM data WHERE bucket = (?) AND timestamp > (?) AND timestamp < (?);",
-            params![filters.bucket, from, to],
+            "DELETE FROM timeseries WHERE bucket = (?) AND timestamp > (?) AND timestamp < (?);",
+            params![bucket, from, to],
         )?;
     } else {
         affected_rows = conn.execute(
-            "DELETE FROM data WHERE timestamp > (?) AND timestamp < (?);",
+            "DELETE FROM timeseries WHERE timestamp > (?) AND timestamp < (?);",
             params![from, to],
         )?
     };
@@ -130,8 +136,8 @@ pub async fn upload_data(
 ) -> Result<StatusCode, AppError> {
     let conn = conn.lock().await;
     let mut stmt =
-        conn.prepare("INSERT INTO data (timestamp, bucket, payload) VALUES (?, ?, ?);")?;
-    let payload = serde_json::to_string(&request.payload).unwrap();
+        conn.prepare("INSERT INTO timeseries (timestamp, bucket, payload) VALUES (?, ?, ?);")?;
+    let payload = serde_json::to_string(&request.payload)?;
     stmt.execute(params![
         request.timestamp.unwrap_or(Timestamp::now().to_string()),
         request.bucket,
