@@ -11,13 +11,13 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tracing::info;
 
-use crate::StateType;
+use crate::{error::AppError, StateType};
 
 #[tracing::instrument(skip_all)]
 pub async fn get_data(
     State(conn): State<StateType>,
     Query(filters): Query<GetDataFilters>,
-) -> (StatusCode, Json<Vec<DataResponse>>) {
+) -> Result<(StatusCode, Json<Vec<DataResponse>>), AppError> {
     let mut from = if let Some(f) = filters.from {
         Timestamp::from_str(&f).unwrap().to_string()
     } else {
@@ -48,8 +48,7 @@ pub async fn get_data(
         stmt = conn
         .prepare(
             "SELECT cast(timestamp as Text), payload, bucket FROM data WHERE bucket = (?) AND timestamp > (?) AND timestamp < (?) ORDER BY timestamp DESC LIMIT (?);",
-        )
-        .unwrap();
+        )?;
         stmt.query_map(params![filters.bucket, from, to, limit], |row| {
             let date_utc: String = row.get(0)?;
             Ok(DataResponse {
@@ -57,15 +56,13 @@ pub async fn get_data(
                 payload: row.get(1)?,
                 bucket: row.get(2)?,
             })
-        })
-        .unwrap()
+        })?
         .collect()
     } else {
         stmt = conn
         .prepare(
             "SELECT cast(timestamp as Text), payload, bucket FROM data WHERE timestamp > (?) AND timestamp < (?) ORDER BY timestamp DESC LIMIT (?);",
-        )
-        .unwrap();
+        )?;
         stmt.query_map(params![from, to, limit], |row| {
             let date_utc: String = row.get(0)?;
             Ok(DataResponse {
@@ -73,19 +70,18 @@ pub async fn get_data(
                 payload: row.get(1)?,
                 bucket: row.get(2)?,
             })
-        })
-        .unwrap()
+        })?
         .collect()
     };
 
-    (StatusCode::OK, Json(response.unwrap()))
+    Ok((StatusCode::OK, Json(response.unwrap())))
 }
 
 #[tracing::instrument(skip_all)]
 pub async fn delete_data(
     State(conn): State<StateType>,
     Query(filters): Query<DeleteDataFilters>,
-) -> (StatusCode, Json<DataDeleteResponse>) {
+) -> Result<(StatusCode, Json<DataDeleteResponse>), AppError> {
     let mut from = if let Some(f) = filters.from {
         Timestamp::from_str(&f).unwrap().to_string()
     } else {
@@ -111,41 +107,38 @@ pub async fn delete_data(
     let affected_rows;
 
     if filters.bucket.is_some() {
-        affected_rows = conn
-            .execute(
-                "DELETE FROM data WHERE bucket = (?) AND timestamp > (?) AND timestamp < (?);",
-                params![filters.bucket, from, to],
-            )
-            .unwrap();
+        affected_rows = conn.execute(
+            "DELETE FROM data WHERE bucket = (?) AND timestamp > (?) AND timestamp < (?);",
+            params![filters.bucket, from, to],
+        )?;
     } else {
-        affected_rows = conn
-            .execute(
-                "DELETE FROM data WHERE timestamp > (?) AND timestamp < (?);",
-                params![from, to],
-            )
-            .unwrap();
+        affected_rows = conn.execute(
+            "DELETE FROM data WHERE timestamp > (?) AND timestamp < (?);",
+            params![from, to],
+        )?
     };
 
     info!(message = "Deleted rows", affected_rows);
 
-    (StatusCode::OK, Json(DataDeleteResponse { affected_rows }))
+    Ok((StatusCode::OK, Json(DataDeleteResponse { affected_rows })))
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn upload_data(State(conn): State<StateType>, Json(request): Json<Data>) -> StatusCode {
+pub async fn upload_data(
+    State(conn): State<StateType>,
+    Json(request): Json<Data>,
+) -> Result<StatusCode, AppError> {
     let conn = conn.lock().await;
-    let mut stmt = conn
-        .prepare("INSERT INTO data (timestamp, bucket, payload) VALUES (?, ?, ?);")
-        .unwrap();
+    let mut stmt =
+        conn.prepare("INSERT INTO data (timestamp, bucket, payload) VALUES (?, ?, ?);")?;
     let payload = serde_json::to_string(&request.payload).unwrap();
     stmt.execute(params![
         request.timestamp.unwrap_or(Timestamp::now().to_string()),
         request.bucket,
         payload
-    ])
-    .unwrap();
+    ])?;
 
-    StatusCode::OK
+    Ok(StatusCode::OK)
 }
 
 #[derive(Deserialize)]

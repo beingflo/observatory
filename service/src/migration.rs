@@ -6,8 +6,10 @@ use tracing::info;
 
 #[tracing::instrument(skip_all)]
 pub async fn apply_migrations(conn: Arc<Mutex<Connection>>) -> Result<(), duckdb::Error> {
-    conn.lock().await.execute_batch(
-        r"CREATE TABLE IF NOT EXISTS data (
+    let conn = conn.lock().await;
+
+    conn.execute_batch(
+        r"CREATE TABLE IF NOT EXISTS timeseries (
             timestamp TIMESTAMPTZ NOT NULL,
             bucket TEXT NOT NULL,
             payload JSON NOT NULL

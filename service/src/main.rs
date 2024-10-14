@@ -9,6 +9,7 @@ use axum::{
 use dashboards::weight::get_weight;
 use data::{delete_data, get_data, upload_data};
 use duckdb::Connection;
+use error::AppError;
 use gps::{get_gps_coords, upload_gps_data};
 use migration::apply_migrations;
 use spa::static_handler;
@@ -20,6 +21,7 @@ use uuid::Uuid;
 
 mod dashboards;
 mod data;
+mod error;
 mod gps;
 mod migration;
 mod spa;
@@ -27,7 +29,7 @@ mod spa;
 type StateType = Arc<Mutex<Connection>>;
 
 #[tokio::main]
-pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+pub async fn main() -> Result<(), AppError> {
     tracing_subscriber::fmt()
         .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
         .init();
