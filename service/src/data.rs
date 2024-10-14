@@ -53,9 +53,8 @@ pub async fn get_data(
             "SELECT cast(timestamp as Text), payload, bucket FROM timeseries WHERE bucket = (?) AND timestamp > (?) AND timestamp < (?) ORDER BY timestamp DESC LIMIT (?);",
         )?;
         stmt.query_map(params![bucket, from, to, limit], |row| {
-            let date_utc: String = row.get(0)?;
             Ok(DataResponse {
-                timestamp: Timestamp::from_str(&date_utc).unwrap().to_string(),
+                timestamp: row.get(0)?,
                 payload: row.get(1)?,
                 bucket: row.get(2)?,
             })
@@ -67,9 +66,8 @@ pub async fn get_data(
             "SELECT cast(timestamp as Text), payload, bucket FROM timeseries WHERE timestamp > (?) AND timestamp < (?) ORDER BY timestamp DESC LIMIT (?);",
         )?;
         stmt.query_map(params![from, to, limit], |row| {
-            let date_utc: String = row.get(0)?;
             Ok(DataResponse {
-                timestamp: Timestamp::from_str(&date_utc).unwrap().to_string(),
+                timestamp: row.get(0)?,
                 payload: row.get(1)?,
                 bucket: row.get(2)?,
             })
@@ -77,7 +75,14 @@ pub async fn get_data(
         .collect()
     };
 
-    Ok((StatusCode::OK, Json(response?)))
+    let mut response = response?;
+
+    // Format dates in DB (can't be done in query_map due to error handling)
+    for d in response.iter_mut() {
+        d.timestamp = Timestamp::from_str(&d.timestamp)?.to_string();
+    }
+
+    Ok((StatusCode::OK, Json(response)))
 }
 
 #[tracing::instrument(skip_all)]
