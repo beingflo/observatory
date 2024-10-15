@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use axum::{extract::State, http::StatusCode, Json};
 use duckdb::params;
 use jiff::Timestamp;
@@ -16,13 +18,14 @@ pub async fn upload_gps_data(
         conn.prepare("INSERT INTO timeseries (timestamp, bucket, payload) VALUES (?, ?, ?);")?;
     for location in payload.locations {
         let payload: String = serde_json::to_string(&location)?;
-        let timestamp = location.properties["timestamp"].as_str();
+        let timestamp = match location.properties["timestamp"].as_str() {
+            Some(ts) => Timestamp::from_str(ts)
+                .map_err(|e| AppError::DateInputError(e))?
+                .to_string(),
+            None => Timestamp::now().to_string(),
+        };
 
-        stmt.execute(params![
-            timestamp.unwrap_or(&Timestamp::now().to_string()),
-            "location",
-            payload
-        ])?;
+        stmt.execute(params![timestamp, "location", payload])?;
     }
 
     Ok(Json(GPSUploadResponse {

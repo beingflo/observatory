@@ -1,4 +1,7 @@
+use std::str::FromStr;
+
 use axum::{extract::State, http::StatusCode, Json};
+use jiff::Timestamp;
 use serde::Serialize;
 
 use crate::{error::AppError, StateType};
@@ -22,7 +25,13 @@ pub async fn get_weight(
         })?
         .collect();
 
-    Ok((StatusCode::OK, Json(response?)))
+    let mut response = response?;
+
+    for d in response.iter_mut() {
+        d.timestamp = Timestamp::from_str(&d.timestamp)?.to_string();
+    }
+
+    Ok((StatusCode::OK, Json(response)))
 }
 
 #[derive(Debug, Serialize)]

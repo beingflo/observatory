@@ -143,11 +143,13 @@ pub async fn upload_data(
     let mut stmt =
         conn.prepare("INSERT INTO timeseries (timestamp, bucket, payload) VALUES (?, ?, ?);")?;
     let payload = serde_json::to_string(&request.payload)?;
-    stmt.execute(params![
-        request.timestamp.unwrap_or(Timestamp::now().to_string()),
-        request.bucket,
-        payload
-    ])?;
+    let timestamp = match request.timestamp {
+        Some(ts) => Timestamp::from_str(&ts)
+            .map_err(|e| AppError::DateInputError(e))?
+            .to_string(),
+        None => Timestamp::now().to_string(),
+    };
+    stmt.execute(params![timestamp, request.bucket, payload])?;
 
     Ok(StatusCode::OK)
 }
