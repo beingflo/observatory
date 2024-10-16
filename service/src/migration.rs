@@ -17,6 +17,16 @@ pub async fn apply_migrations(conn: Arc<Mutex<Connection>>) -> Result<(), duckdb
         ",
     )?;
 
+    conn.execute_batch(
+        r"CREATE TABLE IF NOT EXISTS auth_tokens (
+            created_at TIMESTAMPTZ NOT NULL,
+            expires_at TIMESTAMPTZ NOT NULL,
+            token TEXT NOT NULL,
+            name TEXT NOT NULL
+          );
+        ",
+    )?;
+
     info!(message = "Applied migrations");
 
     Ok(())
