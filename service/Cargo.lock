@@ -1298,6 +1298,7 @@ dependencies = [
  "duckdb",
  "jiff",
  "mime_guess",
+ "rand",
  "rust-embed",
  "serde",
  "serde_json",

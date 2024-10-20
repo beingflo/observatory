@@ -19,3 +19,4 @@ uuid = { version = "1.10.0", features = ["v4"] }
 jiff = "0.1.13"
 thiserror = "1.0.64"
 bcrypt = "0.15.1"
+rand = "0.8.5"
