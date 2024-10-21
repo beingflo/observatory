@@ -4,10 +4,11 @@ use axum::{extract::State, http::StatusCode, Json};
 use jiff::Timestamp;
 use serde::Serialize;
 
-use crate::{error::AppError, StateType};
+use crate::{auth::AuthenticatedUser, error::AppError, StateType};
 
 #[tracing::instrument(skip_all)]
 pub async fn get_weight(
+    _: AuthenticatedUser,
     State(conn): State<StateType>,
 ) -> Result<(StatusCode, Json<Vec<Weight>>), AppError> {
     let conn = conn.lock().await;

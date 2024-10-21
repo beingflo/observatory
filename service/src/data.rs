@@ -11,11 +11,16 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tracing::info;
 
-use crate::{auth::AuthenticatedEmitter, error::AppError, StateType};
+use crate::{
+    auth::{AuthenticatedEmitter, AuthenticatedUser},
+    error::AppError,
+    StateType,
+};
 
 #[tracing::instrument(skip_all)]
 pub async fn get_data(
     State(conn): State<StateType>,
+    _: AuthenticatedUser,
     Query(filters): Query<GetDataFilters>,
 ) -> Result<(StatusCode, Json<Vec<DataResponse>>), AppError> {
     let mut from = if let Some(f) = filters.from {
@@ -88,6 +93,7 @@ pub async fn get_data(
 #[tracing::instrument(skip_all)]
 pub async fn delete_data(
     State(conn): State<StateType>,
+    _: AuthenticatedUser,
     Query(filters): Query<DeleteDataFilters>,
 ) -> Result<(StatusCode, Json<DataDeleteResponse>), AppError> {
     let mut from = if let Some(f) = filters.from {

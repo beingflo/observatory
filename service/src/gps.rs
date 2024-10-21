@@ -6,7 +6,11 @@ use jiff::Timestamp;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::{auth::AuthenticatedEmitter, error::AppError, StateType};
+use crate::{
+    auth::{AuthenticatedEmitter, AuthenticatedUser},
+    error::AppError,
+    StateType,
+};
 
 #[tracing::instrument(skip_all, fields( emitter = %emitter.description))]
 pub async fn upload_gps_data(
@@ -37,6 +41,7 @@ pub async fn upload_gps_data(
 #[tracing::instrument(skip_all)]
 pub async fn get_gps_coords(
     State(conn): State<StateType>,
+    _: AuthenticatedUser,
 ) -> Result<(StatusCode, String), AppError> {
     let conn = conn.lock().await;
     let mut stmt = conn

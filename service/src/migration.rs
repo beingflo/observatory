@@ -19,8 +19,6 @@ pub async fn apply_migrations(conn: Arc<Mutex<Connection>>) -> Result<(), duckdb
 
     conn.execute_batch(
         r"CREATE TABLE IF NOT EXISTS emitters (
-            created_at TIMESTAMPTZ NOT NULL,
-            expires_at TIMESTAMPTZ,
             token TEXT NOT NULL,
             description TEXT NOT NULL
           );
