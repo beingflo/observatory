@@ -6,11 +6,12 @@ use jiff::Timestamp;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::{error::AppError, StateType};
+use crate::{auth::AuthenticatedEmitter, error::AppError, StateType};
 
-#[tracing::instrument(skip_all)]
+#[tracing::instrument(skip_all, fields( emitter = %emitter.description))]
 pub async fn upload_gps_data(
     State(conn): State<StateType>,
+    emitter: AuthenticatedEmitter,
     Json(payload): Json<GPSData>,
 ) -> Result<Json<GPSUploadResponse>, AppError> {
     let conn = conn.lock().await;
