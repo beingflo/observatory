@@ -7,7 +7,7 @@ use axum::{
 use tracing::error;
 
 pub struct AuthenticatedEmitter {
-    description: String,
+    pub description: String,
 }
 
 #[async_trait]

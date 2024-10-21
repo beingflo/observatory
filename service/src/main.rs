@@ -19,12 +19,14 @@ use tracing::{error, info, Span};
 use tracing_subscriber::fmt::format::FmtSpan;
 use uuid::Uuid;
 
+mod auth;
 mod dashboards;
 mod data;
 mod error;
 mod gps;
 mod migration;
 mod spa;
+mod utils;
 
 type StateType = Arc<Mutex<Connection>>;
 

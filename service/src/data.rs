@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tracing::info;
 
-use crate::{error::AppError, StateType};
+use crate::{auth::AuthenticatedEmitter, error::AppError, StateType};
 
 #[tracing::instrument(skip_all)]
 pub async fn get_data(
@@ -50,7 +50,7 @@ pub async fn get_data(
     let response: Result<Vec<DataResponse>, _> = if let Some(bucket) = filters.bucket {
         stmt = conn
         .prepare(
-            "SELECT cast(timestamp as Text), payload, bucket FROM timeseries WHERE bucket = (?) AND timestamp > (?) AND timestamp < (?) ORDER BY timestamp DESC LIMIT (?);",
+            "SELECT cast(timestamp as Text), payload, bucket FROM timeseries WHERE bucket = (?) AND timestamp > CAST((?) as TIMESTAMP) AND timestamp < CAST((?) AS TIMESTAMP) ORDER BY timestamp DESC LIMIT (?);",
         )?;
         stmt.query_map(params![bucket, from, to, limit], |row| {
             Ok(DataResponse {
@@ -63,7 +63,7 @@ pub async fn get_data(
     } else {
         stmt = conn
         .prepare(
-            "SELECT cast(timestamp as Text), payload, bucket FROM timeseries WHERE timestamp > (?) AND timestamp < (?) ORDER BY timestamp DESC LIMIT (?);",
+            "SELECT cast(timestamp as Text), payload, bucket FROM timeseries WHERE timestamp > CAST((?) as TIMESTAMP) AND timestamp < CAST((?) as TIMESTAMP) ORDER BY timestamp DESC LIMIT (?);",
         )?;
         stmt.query_map(params![from, to, limit], |row| {
             Ok(DataResponse {
@@ -134,9 +134,10 @@ pub async fn delete_data(
     Ok((StatusCode::OK, Json(DataDeleteResponse { affected_rows })))
 }
 
-#[tracing::instrument(skip_all)]
+#[tracing::instrument(skip_all, fields( emitter = %emitter.description))]
 pub async fn upload_data(
     State(conn): State<StateType>,
+    emitter: AuthenticatedEmitter,
     Json(request): Json<Data>,
 ) -> Result<StatusCode, AppError> {
     let conn = conn.lock().await;
