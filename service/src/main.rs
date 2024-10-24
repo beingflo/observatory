@@ -36,6 +36,10 @@ pub async fn main() -> Result<(), AppError> {
         .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
         .init();
 
+    dotenvy::dotenv()
+        .map_err(|_| error!("Failed to load env"))
+        .unwrap();
+
     let conn = Arc::new(Mutex::new(Connection::open("./db/db.duckdb")?));
 
     info!("Opened database connection");

@@ -12,6 +12,7 @@
 # Added by cargo
 
 /target
+.env
 **/db.duckdb*
 
 **/.DS_Store
