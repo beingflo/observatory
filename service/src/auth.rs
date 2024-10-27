@@ -1,4 +1,4 @@
-use crate::{error::AppError, StateType};
+use crate::{error::AppError, AppState};
 use axum::{
     async_trait,
     extract::FromRequestParts,
@@ -14,15 +14,15 @@ pub struct AuthenticatedEmitter {
 pub struct AuthenticatedUser {}
 
 #[async_trait]
-impl FromRequestParts<StateType> for AuthenticatedEmitter {
+impl FromRequestParts<AppState> for AuthenticatedEmitter {
     type Rejection = AppError;
 
     #[tracing::instrument(skip_all)]
     async fn from_request_parts(
         parts: &mut Parts,
-        state: &StateType,
+        state: &AppState,
     ) -> Result<Self, Self::Rejection> {
-        let connection = state.lock().await;
+        let connection = state.connection.lock().await;
 
         let headers = match HeaderMap::from_request_parts(parts, state).await {
             Ok(headers) => headers,
@@ -65,13 +65,13 @@ impl FromRequestParts<StateType> for AuthenticatedEmitter {
 }
 
 #[async_trait]
-impl FromRequestParts<StateType> for AuthenticatedUser {
+impl FromRequestParts<AppState> for AuthenticatedUser {
     type Rejection = Response;
 
     #[tracing::instrument(skip_all)]
     async fn from_request_parts(
         parts: &mut Parts,
-        state: &StateType,
+        state: &AppState,
     ) -> Result<Self, Self::Rejection> {
         let headers = match HeaderMap::from_request_parts(parts, state).await {
             Ok(headers) => headers,
@@ -97,7 +97,7 @@ impl FromRequestParts<StateType> for AuthenticatedUser {
             }
         };
 
-        if auth == "Basic YXNkZjp0ZXN0" {
+        if auth.split(" ").nth(1).unwrap_or("invalid") == state.admin_auth {
             return Ok(AuthenticatedUser {});
         }
 

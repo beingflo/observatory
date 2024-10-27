@@ -1,4 +1,4 @@
-use std::{sync::Arc, time::Duration};
+use std::{env, process::abort, sync::Arc, time::Duration};
 
 use axum::{
     body::Body,
@@ -15,7 +15,7 @@ use migration::apply_migrations;
 use spa::static_handler;
 use tokio::{signal, sync::Mutex};
 use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
-use tracing::{error, info, Span};
+use tracing::{error, info, warn, Span};
 use tracing_subscriber::fmt::format::FmtSpan;
 use uuid::Uuid;
 
@@ -28,7 +28,11 @@ mod migration;
 mod spa;
 mod utils;
 
-type StateType = Arc<Mutex<Connection>>;
+#[derive(Clone)]
+struct AppState {
+    connection: Arc<Mutex<Connection>>,
+    admin_auth: String,
+}
 
 #[tokio::main]
 pub async fn main() -> Result<(), AppError> {
@@ -36,9 +40,15 @@ pub async fn main() -> Result<(), AppError> {
         .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
         .init();
 
-    dotenvy::dotenv()
-        .map_err(|_| error!("Failed to load env"))
-        .unwrap();
+    match dotenvy::dotenv() {
+        Ok(_) => info!("Loaded .env file"),
+        Err(_) => warn!("Failed to load .env file"),
+    };
+
+    let Some((_, basic_auth)) = env::vars().find(|v| v.0.eq("ADMIN_BASIC_AUTH")) else {
+        error!("Admin auth credentials not in environment");
+        abort();
+    };
 
     let conn = Arc::new(Mutex::new(Connection::open("./db/db.duckdb")?));
 
@@ -74,7 +84,10 @@ pub async fn main() -> Result<(), AppError> {
                     },
                 ),
         )
-        .with_state(conn);
+        .with_state(AppState {
+            connection: conn,
+            admin_auth: basic_auth,
+        });
 
     let port = 3000;
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))

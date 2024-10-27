@@ -4,14 +4,14 @@ use axum::{extract::State, http::StatusCode, Json};
 use jiff::Timestamp;
 use serde::Serialize;
 
-use crate::{auth::AuthenticatedUser, error::AppError, StateType};
+use crate::{auth::AuthenticatedUser, error::AppError, AppState};
 
 #[tracing::instrument(skip_all)]
 pub async fn get_weight(
     _: AuthenticatedUser,
-    State(conn): State<StateType>,
+    State(state): State<AppState>,
 ) -> Result<(StatusCode, Json<Vec<Weight>>), AppError> {
-    let conn = conn.lock().await;
+    let conn = state.connection.lock().await;
     let mut stmt = conn
         .prepare(
             "SELECT cast(timestamp as Text), payload -> '$.weight' FROM timeseries WHERE bucket = 'weight' ORDER BY timestamp DESC;",

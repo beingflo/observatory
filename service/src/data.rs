@@ -14,12 +14,12 @@ use tracing::info;
 use crate::{
     auth::{AuthenticatedEmitter, AuthenticatedUser},
     error::AppError,
-    StateType,
+    AppState,
 };
 
 #[tracing::instrument(skip_all)]
 pub async fn get_data(
-    State(conn): State<StateType>,
+    State(state): State<AppState>,
     _: AuthenticatedUser,
     Query(filters): Query<GetDataFilters>,
 ) -> Result<(StatusCode, Json<Vec<DataResponse>>), AppError> {
@@ -49,7 +49,7 @@ pub async fn get_data(
 
     let limit = filters.limit.unwrap_or(100);
 
-    let conn = conn.lock().await;
+    let conn = state.connection.lock().await;
     let mut stmt;
 
     let response: Result<Vec<DataResponse>, _> = if let Some(bucket) = filters.bucket {
@@ -92,7 +92,7 @@ pub async fn get_data(
 
 #[tracing::instrument(skip_all)]
 pub async fn delete_data(
-    State(conn): State<StateType>,
+    State(state): State<AppState>,
     _: AuthenticatedUser,
     Query(filters): Query<DeleteDataFilters>,
 ) -> Result<(StatusCode, Json<DataDeleteResponse>), AppError> {
@@ -120,7 +120,7 @@ pub async fn delete_data(
             .to_string();
     }
 
-    let conn = conn.lock().await;
+    let conn = state.connection.lock().await;
     let affected_rows;
 
     if let Some(bucket) = filters.bucket {
@@ -142,11 +142,11 @@ pub async fn delete_data(
 
 #[tracing::instrument(skip_all, fields( emitter = %emitter.description))]
 pub async fn upload_data(
-    State(conn): State<StateType>,
+    State(state): State<AppState>,
     emitter: AuthenticatedEmitter,
     Json(request): Json<Data>,
 ) -> Result<StatusCode, AppError> {
-    let conn = conn.lock().await;
+    let conn = state.connection.lock().await;
     let mut stmt =
         conn.prepare("INSERT INTO timeseries (timestamp, bucket, payload) VALUES (?, ?, ?);")?;
     let payload = serde_json::to_string(&request.payload)?;

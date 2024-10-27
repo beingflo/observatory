@@ -9,16 +9,16 @@ use serde_json::Value;
 use crate::{
     auth::{AuthenticatedEmitter, AuthenticatedUser},
     error::AppError,
-    StateType,
+    AppState,
 };
 
 #[tracing::instrument(skip_all, fields( emitter = %emitter.description))]
 pub async fn upload_gps_data(
-    State(conn): State<StateType>,
+    State(state): State<AppState>,
     emitter: AuthenticatedEmitter,
     Json(payload): Json<GPSData>,
 ) -> Result<Json<GPSUploadResponse>, AppError> {
-    let conn = conn.lock().await;
+    let conn = state.connection.lock().await;
     let mut stmt =
         conn.prepare("INSERT INTO timeseries (timestamp, bucket, payload) VALUES (?, ?, ?);")?;
     for location in payload.locations {
@@ -40,10 +40,10 @@ pub async fn upload_gps_data(
 
 #[tracing::instrument(skip_all)]
 pub async fn get_gps_coords(
-    State(conn): State<StateType>,
+    State(state): State<AppState>,
     _: AuthenticatedUser,
 ) -> Result<(StatusCode, String), AppError> {
-    let conn = conn.lock().await;
+    let conn = state.connection.lock().await;
     let mut stmt = conn
         .prepare("SELECT cast(payload -> '$.geometry.coordinates[0]' as float), cast(payload -> '$.geometry.coordinates[1]' as float) FROM timeseries WHERE bucket = 'location' ORDER BY timestamp DESC;")?;
 
