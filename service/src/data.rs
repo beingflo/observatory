@@ -125,12 +125,12 @@ pub async fn delete_data(
 
     if let Some(bucket) = filters.bucket {
         affected_rows = conn.execute(
-            "DELETE FROM timeseries WHERE bucket = (?) AND timestamp > (?) AND timestamp < (?);",
+            "DELETE FROM timeseries WHERE bucket = (?) AND timestamp > CAST((?) as TIMESTAMP) AND timestamp < CAST((?) as TIMESTAMP);",
             params![bucket, from, to],
         )?;
     } else {
         affected_rows = conn.execute(
-            "DELETE FROM timeseries WHERE timestamp > (?) AND timestamp < (?);",
+            "DELETE FROM timeseries WHERE timestamp > CAST((?) as TIMESTAMP) AND timestamp < CAST((?) as TIMESTAMP);",
             params![from, to],
         )?
     };
