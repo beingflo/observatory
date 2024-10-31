@@ -37,7 +37,7 @@ impl FromRequestParts<AppState> for AuthenticatedEmitter {
             Err(_) => return Err(AppError::Status(StatusCode::INTERNAL_SERVER_ERROR)),
         };
 
-        let token = match headers.get("api-token") {
+        let token = match headers.get("emitter") {
             Some(token) => token
                 .to_str()
                 .map_err(|_| AppError::Status(StatusCode::BAD_REQUEST))
