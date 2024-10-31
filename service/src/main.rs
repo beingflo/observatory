@@ -6,7 +6,7 @@ use axum::{
     routing::{delete, get, post},
     Router,
 };
-use dashboards::weight::get_weight;
+use dashboards::{observatory::get_observatory_info, weight::get_weight};
 use data::{delete_data, get_data, upload_data, upload_data_url_only};
 use duckdb::Connection;
 use emitters::{add_emitter, delete_emitter};
@@ -64,6 +64,7 @@ pub async fn main() -> Result<(), AppError> {
         .route("/api/data", get(get_data))
         .route("/api/data", delete(delete_data))
         .route("/api/weight", get(get_weight))
+        .route("/api/observatory", get(get_observatory_info))
         .route("/api/gps", post(upload_gps_data))
         .route("/api/gps", get(get_gps_coords))
         .route("/api/emitter", post(add_emitter))
