@@ -13,6 +13,18 @@ pub async fn add_emitter(
 ) -> Result<Json<AddEmitterResponse>, AppError> {
     let conn = state.connection.lock().await;
 
+    let mut stmt = conn.prepare("SELECT count(*) FROM emitters WHERE description = (?);")?;
+    let mut rows = stmt.query(params![request.description])?;
+    let count = if let Some(row) = rows.next()? {
+        row.get(0)?
+    } else {
+        0
+    };
+
+    if count > 0 {
+        return Err(AppError::Status(StatusCode::BAD_REQUEST));
+    }
+
     let mut stmt = conn.prepare("INSERT INTO emitters (token, description) VALUES (?, ?);")?;
     let token = get_auth_token();
     stmt.execute(params![token, request.description])?;
