@@ -1,0 +1,15 @@
+services:
+  observatory:
+    image: "ghcr.io/beingflo/observatory:0.1.1"
+    container_name: observatory
+    environment:
+      ADMIN_BASIC_AUTH: "XXX"
+    volumes:
+      - ./db:/usr/src/app/db/
+    restart: unless-stopped
+    networks:
+      - caddy_net
+
+networks:
+  caddy_net:
+    external: true

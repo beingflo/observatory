@@ -51,6 +51,7 @@ pub async fn main() -> Result<(), AppError> {
         error!("Admin auth credentials not in environment");
         abort();
     };
+    info!("Found ADMIN_BASIC_AUTH in environment");
 
     let conn = Arc::new(Mutex::new(Connection::open("./db/db.duckdb")?));
 
