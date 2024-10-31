@@ -9,6 +9,7 @@ use axum::{
 use dashboards::weight::get_weight;
 use data::{delete_data, get_data, upload_data};
 use duckdb::Connection;
+use emitters::{add_emitter, delete_emitter};
 use error::AppError;
 use gps::{get_gps_coords, upload_gps_data};
 use migration::apply_migrations;
@@ -22,6 +23,7 @@ use uuid::Uuid;
 mod auth;
 mod dashboards;
 mod data;
+mod emitters;
 mod error;
 mod gps;
 mod migration;
@@ -63,6 +65,8 @@ pub async fn main() -> Result<(), AppError> {
         .route("/api/weight", get(get_weight))
         .route("/api/gps", post(upload_gps_data))
         .route("/api/gps", get(get_gps_coords))
+        .route("/api/emitter", post(add_emitter))
+        .route("/api/emitter", delete(delete_emitter))
         .fallback(static_handler)
         .layer(
             TraceLayer::new_for_http()
