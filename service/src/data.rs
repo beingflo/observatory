@@ -1,7 +1,7 @@
-use std::str::FromStr;
+use std::{collections::HashMap, str::FromStr};
 
 use axum::{
-    extract::{Query, State},
+    extract::{Path, Query, State},
     http::StatusCode,
     Json,
 };
@@ -157,6 +157,29 @@ pub async fn upload_data(
         None => Timestamp::now().to_string(),
     };
     stmt.execute(params![timestamp, request.bucket, payload])?;
+
+    Ok(StatusCode::OK)
+}
+
+#[tracing::instrument(skip_all, fields( emitter = %emitter.description))]
+pub async fn upload_data_url_only(
+    State(state): State<AppState>,
+    emitter: AuthenticatedEmitter,
+    Path((_, bucket)): Path<(String, String)>,
+    Query(data): Query<HashMap<String, String>>,
+) -> Result<StatusCode, AppError> {
+    let conn = state.connection.lock().await;
+    let mut stmt =
+        conn.prepare("INSERT INTO timeseries (timestamp, bucket, payload) VALUES (?, ?, ?);")?;
+
+    let timestamp = match data.get("timestamp") {
+        Some(ts) => Timestamp::from_str(&ts)
+            .map_err(|e| AppError::DateInputError(e))?
+            .to_string(),
+        None => Timestamp::now().to_string(),
+    };
+    let payload = serde_json::to_string(&data)?;
+    stmt.execute(params![timestamp, bucket, payload])?;
 
     Ok(StatusCode::OK)
 }

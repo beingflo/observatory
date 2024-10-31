@@ -14,7 +14,7 @@ pub async fn get_weight(
     let conn = state.connection.lock().await;
     let mut stmt = conn
         .prepare(
-            "SELECT cast(timestamp as Text), payload -> '$.weight' FROM timeseries WHERE bucket = 'weight' ORDER BY timestamp DESC;",
+            "SELECT cast(timestamp as Text), cast(payload -> '$.weight' as Integer) FROM timeseries WHERE bucket = 'weight' ORDER BY timestamp DESC;",
         )?;
 
     let response: Result<Vec<Weight>, _> = stmt

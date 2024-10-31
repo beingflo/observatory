@@ -1,7 +1,9 @@
+use std::collections::HashMap;
+
 use crate::{error::AppError, AppState};
 use axum::{
     async_trait,
-    extract::FromRequestParts,
+    extract::{FromRequestParts, Path},
     http::{request::Parts, HeaderMap, HeaderValue, StatusCode},
     response::{IntoResponse, Response},
 };
@@ -24,6 +26,12 @@ impl FromRequestParts<AppState> for AuthenticatedEmitter {
     ) -> Result<Self, Self::Rejection> {
         let connection = state.connection.lock().await;
 
+        let path: Path<HashMap<String, String>> = match Path::from_request_parts(parts, state).await
+        {
+            Ok(path) => path,
+            Err(_) => return Err(AppError::Status(StatusCode::INTERNAL_SERVER_ERROR)),
+        };
+
         let headers = match HeaderMap::from_request_parts(parts, state).await {
             Ok(headers) => headers,
             Err(_) => return Err(AppError::Status(StatusCode::INTERNAL_SERVER_ERROR)),
@@ -36,7 +44,10 @@ impl FromRequestParts<AppState> for AuthenticatedEmitter {
                 .unwrap(),
             None => {
                 error!(message = "Missing token header");
-                return Err(AppError::Status(StatusCode::UNAUTHORIZED));
+                match path.get("emitter") {
+                    Some(value) => value,
+                    None => return Err(AppError::Status(StatusCode::UNAUTHORIZED)),
+                }
             }
         };
 
