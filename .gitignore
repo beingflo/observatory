@@ -13,6 +13,7 @@
 
 /target
 .env
+.env.prod
 **/db.duckdb*
 
 **/.DS_Store
