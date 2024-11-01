@@ -7,8 +7,7 @@ echo -e "You're deploying observatory to ${RED}production!${NC}"
 ## Check that there are no uncommited changes
 if [ -n "$(git status --porcelain)" ]; then
   echo "There are uncomitted changes"
-  # TODO
-  #exit 1
+  exit 1
 else
   echo "No uncomitted changes"
 fi
@@ -88,3 +87,6 @@ if [[ $? -ne 0 ]]; then
 fi
 
 ## Commit and tag version
+git commit -am "Release ${newVersion}"
+git tag "${cleanVersion}"
+git push origin --tags
