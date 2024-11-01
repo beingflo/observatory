@@ -88,5 +88,5 @@ fi
 
 ## Commit and tag version
 git commit -am "Release ${newVersion}"
-git tag "${cleanVersion}"
+git tag "${newVersion}"
 git push origin --tags
