@@ -18,8 +18,6 @@ version=$(cargo metadata --format-version=1 --no-deps | jq '.packages[0].version
 cd ..
 
 echo "Latest version: ${version}"
-# TODO
-#echo "Currently running version: ${version}"
 
 ## Prompt for next version (default current version)
 read -p "Enter version to be deployed: " newVersion 
