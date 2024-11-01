@@ -1,6 +1,6 @@
 services:
   observatory:
-    image: "ghcr.io/beingflo/observatory:0.1.6"
+    image: "ghcr.io/beingflo/observatory:0.1.7"
     container_name: observatory
     env_file: ".env.prod"
     volumes:
