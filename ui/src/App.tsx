@@ -15,7 +15,7 @@ function App() {
 
   return (
     <div>
-      <div class="text-xl font-bold p-8">Observatory</div>
+      <div class="text-xl font-bold p-8">Observatory test</div>
       <For each={data()}>
         {(item) => (
           <div class="flex flex-row gap-8 px-8">
