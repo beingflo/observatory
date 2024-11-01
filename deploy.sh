@@ -87,6 +87,7 @@ if [[ $? -ne 0 ]]; then
 fi
 
 ## Commit and tag version
+echo "Commit and tag release"
 git commit -am "Release ${newVersion}"
 git tag "${newVersion}"
 git push origin --tags
