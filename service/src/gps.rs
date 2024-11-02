@@ -1,6 +1,10 @@
 use std::str::FromStr;
 
-use axum::{extract::State, http::StatusCode, Json};
+use axum::{
+    extract::{Path, State},
+    http::StatusCode,
+    Json,
+};
 use duckdb::params;
 use jiff::Timestamp;
 use serde::{Deserialize, Serialize};
@@ -16,6 +20,7 @@ use crate::{
 pub async fn upload_gps_data(
     State(state): State<AppState>,
     emitter: AuthenticatedEmitter,
+    Path((_, bucket)): Path<(String, String)>,
     Json(payload): Json<GPSData>,
 ) -> Result<Json<GPSUploadResponse>, AppError> {
     let conn = state.connection.lock().await;
@@ -30,7 +35,7 @@ pub async fn upload_gps_data(
             None => Timestamp::now().to_string(),
         };
 
-        stmt.execute(params![timestamp, "location", payload])?;
+        stmt.execute(params![timestamp, bucket, payload])?;
     }
 
     Ok(Json(GPSUploadResponse {
