@@ -1,7 +1,7 @@
 use axum::{extract::State, http::StatusCode, Json};
 use duckdb::params;
 use serde::{Deserialize, Serialize};
-use tracing::info;
+use tracing::{error, info};
 
 use crate::{auth::AuthenticatedUser, error::AppError, utils::get_auth_token, AppState};
 
@@ -22,6 +22,7 @@ pub async fn add_emitter(
     };
 
     if count > 0 {
+        error!(message = "emitter already exists");
         return Err(AppError::Status(StatusCode::BAD_REQUEST));
     }
 
