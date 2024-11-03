@@ -47,13 +47,14 @@ pub async fn upload_gps_data(
 pub async fn get_gps_coords(
     State(state): State<AppState>,
     _: AuthenticatedUser,
+    Path(bucket): Path<String>,
 ) -> Result<(StatusCode, String), AppError> {
     let conn = state.connection.lock().await;
     let mut stmt = conn
-        .prepare("SELECT cast(payload -> '$.geometry.coordinates[0]' as float), cast(payload -> '$.geometry.coordinates[1]' as float) FROM timeseries WHERE bucket = 'location' ORDER BY timestamp DESC;")?;
+        .prepare("SELECT cast(payload -> '$.geometry.coordinates[0]' as float), cast(payload -> '$.geometry.coordinates[1]' as float) FROM timeseries WHERE bucket = (?) ORDER BY timestamp DESC;")?;
 
     let response: Result<Vec<GPSResponse>, _> = stmt
-        .query_map([], |row| {
+        .query_map([bucket], |row| {
             Ok(GPSResponse {
                 longitude: row.get(0)?,
                 latitude: row.get(1)?,

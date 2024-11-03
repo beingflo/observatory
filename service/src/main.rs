@@ -67,7 +67,7 @@ pub async fn main() -> Result<(), AppError> {
         .route("/api/weight", get(get_weight))
         .route("/api/observatory", get(get_observatory_info))
         .route("/api/gps/:emitter/:bucket", post(upload_gps_data))
-        .route("/api/gps", get(get_gps_coords))
+        .route("/api/gps/:bucket", get(get_gps_coords))
         .route("/api/emitter", post(add_emitter))
         .route("/api/emitter", delete(delete_emitter))
         .fallback(static_handler)
