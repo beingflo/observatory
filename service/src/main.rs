@@ -17,7 +17,6 @@ use spa::static_handler;
 use tokio::{signal, sync::Mutex};
 use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
 use tracing::{error, info, warn, Span};
-use tracing_subscriber::fmt::format::FmtSpan;
 use uuid::Uuid;
 
 mod auth;
@@ -38,9 +37,7 @@ struct AppState {
 
 #[tokio::main]
 pub async fn main() -> Result<(), AppError> {
-    tracing_subscriber::fmt()
-        .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
-        .init();
+    tracing_subscriber::fmt().init();
 
     match dotenvy::dotenv() {
         Ok(_) => info!("Loaded .env file"),

@@ -7,7 +7,7 @@ use axum::{
     http::{request::Parts, HeaderMap, HeaderValue, StatusCode},
     response::{IntoResponse, Response},
 };
-use tracing::error;
+use tracing::{error, info};
 
 pub struct AuthenticatedEmitter {
     pub description: String,
@@ -43,10 +43,13 @@ impl FromRequestParts<AppState> for AuthenticatedEmitter {
                 .map_err(|_| AppError::Status(StatusCode::BAD_REQUEST))
                 .unwrap(),
             None => {
-                error!(message = "Missing token header");
+                info!(message = "Missing token header");
                 match path.get("emitter") {
                     Some(value) => value,
-                    None => return Err(AppError::Status(StatusCode::UNAUTHORIZED)),
+                    None => {
+                        error!(message = "Missing emitter path");
+                        return Err(AppError::Status(StatusCode::UNAUTHORIZED));
+                    }
                 }
             }
         };
