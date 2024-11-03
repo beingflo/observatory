@@ -65,7 +65,7 @@ pub async fn get_weight(
 
     let mut smooth_weights = Vec::new();
     let mut last = weights[0].weight;
-    let alpha = 0.5;
+    let alpha = 0.3;
     for d in weights.iter() {
         last = alpha * d.weight + (1.0 - alpha) * last;
         smooth_weights.push(Weight {
