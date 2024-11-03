@@ -5,6 +5,28 @@ use tracing::{error, info};
 
 use crate::{auth::AuthenticatedUser, error::AppError, utils::get_auth_token, AppState};
 
+#[tracing::instrument(skip_all)]
+pub async fn get_emitters(
+    State(state): State<AppState>,
+    _: AuthenticatedUser,
+) -> Result<Json<Vec<Emitter>>, AppError> {
+    let conn = state.connection.lock().await;
+
+    let mut stmt = conn.prepare("SELECT description, token FROM emitters;")?;
+    let response: Result<Vec<Emitter>, _> = stmt
+        .query_map([], |row| {
+            Ok(Emitter {
+                description: row.get(0)?,
+                token: row.get(1)?,
+            })
+        })?
+        .collect();
+
+    let response = response?;
+
+    Ok(Json(response))
+}
+
 #[tracing::instrument(skip_all, fields( emitter = %request.description))]
 pub async fn add_emitter(
     State(state): State<AppState>,
@@ -70,6 +92,12 @@ pub struct AddEmitterRequest {
 
 #[derive(Debug, Serialize)]
 pub struct AddEmitterResponse {
+    description: String,
+    token: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct Emitter {
     description: String,
     token: String,
 }

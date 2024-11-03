@@ -9,7 +9,7 @@ use axum::{
 use dashboards::{observatory::get_observatory_info, weight::get_weight};
 use data::{delete_data, get_data, upload_data, upload_data_url_only};
 use duckdb::Connection;
-use emitters::{add_emitter, delete_emitter};
+use emitters::{add_emitter, delete_emitter, get_emitters};
 use error::AppError;
 use gps::{get_gps_coords, upload_gps_data};
 use migration::apply_migrations;
@@ -68,6 +68,7 @@ pub async fn main() -> Result<(), AppError> {
         .route("/api/observatory", get(get_observatory_info))
         .route("/api/gps/:emitter/:bucket", post(upload_gps_data))
         .route("/api/gps/:bucket", get(get_gps_coords))
+        .route("/api/emitter", get(get_emitters))
         .route("/api/emitter", post(add_emitter))
         .route("/api/emitter", delete(delete_emitter))
         .fallback(static_handler)
