@@ -6,6 +6,7 @@ use axum::{
     routing::{delete, get, post},
     Router,
 };
+use buckets::get_distinct_buckets;
 use dashboards::{observatory::get_observatory_info, weight::get_weight};
 use data::{delete_data, get_data, upload_data, upload_data_url_only};
 use duckdb::Connection;
@@ -20,6 +21,7 @@ use tracing::{error, info, warn, Span};
 use uuid::Uuid;
 
 mod auth;
+mod buckets;
 mod dashboards;
 mod data;
 mod emitters;
@@ -68,6 +70,7 @@ pub async fn main() -> Result<(), AppError> {
         .route("/api/emitter", get(get_emitters))
         .route("/api/emitter", post(add_emitter))
         .route("/api/emitter", delete(delete_emitter))
+        .route("/api/buckets", get(get_distinct_buckets))
         .fallback(static_handler)
         .layer(
             TraceLayer::new_for_http()
