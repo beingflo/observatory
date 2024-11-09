@@ -4,6 +4,10 @@ export const dashboards = [
     target: "/observatory",
   },
   {
+    title: "Home",
+    target: "/home",
+  },
+  {
     title: "Weight",
     target: "/weight",
   },
