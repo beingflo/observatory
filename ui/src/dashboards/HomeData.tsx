@@ -12,8 +12,8 @@ const HomeData = () => {
   return (
     <div>
       <div class="text-xl font-bold p-8">Home</div>
-      <div class="p-12 w-full mx-auto mt-16">
-        <div class="p-2 w-full grid grid-cols-3 gap-12">
+      <div class="w-full mx-auto mt-16">
+        <div class="p-2 w-full grid grid-cols-1 lg:grid-cols-3 gap-12">
           <Show when={data()}>
             {Plot.plot({
               y: {
