@@ -14,8 +14,13 @@ const fetchHomeData = async (hours?: number) => {
 };
 
 const HomeData = () => {
-  const [data] = createResource(() => fetchHomeData(6));
-  const [dataFull] = createResource(() => fetchHomeData());
+  const [data, { refetch }] = createResource(() => fetchHomeData(6));
+  const [dataFull, { refetch: refetchFull }] = createResource(() =>
+    fetchHomeData()
+  );
+
+  setInterval(() => refetch(), 30000);
+  setInterval(() => refetchFull(), 30000);
 
   return (
     <div class="p-8">
