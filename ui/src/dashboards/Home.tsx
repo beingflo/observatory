@@ -17,7 +17,7 @@ export const Home = () => {
   return (
     <Dashboard title="Home">
       <div class="flex flex-col gap-8">
-        <div class="grid grid-cols-2 md:grid-cols-4 2xl:grid-cols-12 gap-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 2xl:grid-cols-8 3xl:grid-cols-12 gap-8">
           <CO2LatestLivingRoom />
           <HumidityLatestLivingRoom />
           <HumidityLatestLaundryRoom />
@@ -26,7 +26,7 @@ export const Home = () => {
           <BrightnessLatestReadingNook />
           <BarometricLatestReadingNook />
         </div>
-        <div class="grid grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <CO2LivingRoom />
           <HumidityLivingRoom />
         </div>
