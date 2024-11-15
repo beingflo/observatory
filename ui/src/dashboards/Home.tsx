@@ -2,6 +2,7 @@ import { Dashboard } from "../components/Dashboard";
 import { BarometricLatestReadingNook } from "../elements/Barometric-latest-reading-nook";
 import { BarometricReadingNook } from "../elements/Barometric-reading-nook";
 import { BrightnessLatestReadingNook } from "../elements/Brightness-latest-reading-nook";
+import { BrightnessReadingNook } from "../elements/Brightness-reading-nook copy";
 import { CO2LatestLivingRoom } from "../elements/CO2-latest-living-room";
 import { CO2LivingRoom } from "../elements/CO2-living-room";
 import { HumidityLatestLaundryRoom } from "../elements/Humidity-latest-laundry-room";
@@ -32,6 +33,7 @@ export const Home = () => {
         <HumidityLaundryRoom />
         <TemperatureLivingRoom />
         <BarometricReadingNook />
+        <BrightnessReadingNook />
       </div>
     </Dashboard>
   );
