@@ -3,20 +3,18 @@ import * as Plot from "@observablehq/plot";
 import { Chart } from "../components/Chart";
 import { Card } from "../components/Card";
 
-const fetchHomeData = async (hours?: number) => {
-  if (hours) {
-    const now = new Date();
-    now.setHours(now.getHours() - hours);
-    const response = await fetch(`/api/home?from=${now.toISOString()}`);
-    return response.json();
-  } else {
-    const response = await fetch(`/api/home`);
-    return response.json();
-  }
+const fetchData = async (hours: number) => {
+  const now = new Date();
+  now.setHours(now.getHours() - hours);
+
+  const response = await fetch(
+    `/api/data?bucket=co2-sensor-living-room&from=${now.toISOString()}`
+  );
+  return response.json();
 };
 
 export const CO2LivingRoom = () => {
-  const [data, { refetch }] = createResource(() => fetchHomeData(6));
+  const [data, { refetch }] = createResource(() => fetchData(12));
 
   setTimeout(() => refetch(), 30000);
 
@@ -30,9 +28,9 @@ export const CO2LivingRoom = () => {
             grid: true,
           },
           marks: [
-            Plot.lineY(data()?.data, {
+            Plot.lineY(data(), {
               x: (d) => new Date(d.timestamp),
-              y: "co2",
+              y: (d) => d.payload.co2,
             }),
           ],
         }}

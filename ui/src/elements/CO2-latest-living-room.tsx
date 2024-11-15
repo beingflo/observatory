@@ -6,7 +6,7 @@ const getData = async () => {
     `/api/data?bucket=co2-sensor-living-room&limit=1`
   );
   const json = await response.json();
-  return JSON.parse(json?.[0]?.payload)?.co2;
+  return json?.[0]?.payload?.co2;
 };
 
 export const CO2LatestLivingRoom = () => {

@@ -11,7 +11,7 @@ use data::{delete_data, get_data, upload_data, upload_data_url_only};
 use duckdb::Connection;
 use emitters::{add_emitter, delete_emitter, get_emitters};
 use endpoints::{
-    location::get_gps_coords, observatory::get_observatory_info, sensors::get_home_data,
+    location::get_gps_coords, observatory::get_observatory_info, sensors::get_co2,
     weight::get_weight,
 };
 use error::AppError;
@@ -67,7 +67,7 @@ pub async fn main() -> Result<(), AppError> {
         .route("/api/data", get(get_data))
         .route("/api/data", delete(delete_data))
         .route("/api/weight", get(get_weight))
-        .route("/api/home", get(get_home_data))
+        .route("/api/co2", get(get_co2))
         .route("/api/observatory", get(get_observatory_info))
         .route("/api/gps/:emitter/:bucket", post(upload_gps_data))
         .route("/api/gps/:bucket", get(get_gps_coords))

@@ -47,7 +47,7 @@ pub async fn get_data(
             .to_string();
     }
 
-    let limit = filters.limit.unwrap_or(100);
+    let limit = filters.limit.unwrap_or(10000);
 
     let conn = state.connection.lock().await;
     let mut stmt;
@@ -58,9 +58,10 @@ pub async fn get_data(
             "SELECT cast(timestamp as Text), payload, bucket FROM timeseries WHERE bucket = (?) AND timestamp > CAST((?) as TIMESTAMP) AND timestamp < CAST((?) AS TIMESTAMP) ORDER BY timestamp DESC LIMIT (?);",
         )?;
         stmt.query_map(params![bucket, from, to, limit], |row| {
+            let payload: String = row.get(1)?;
             Ok(DataResponse {
                 timestamp: row.get(0)?,
-                payload: row.get(1)?,
+                payload: serde_json::from_str(&payload).unwrap(),
                 bucket: row.get(2)?,
             })
         })?
@@ -71,9 +72,10 @@ pub async fn get_data(
             "SELECT cast(timestamp as Text), payload, bucket FROM timeseries WHERE timestamp > CAST((?) as TIMESTAMP) AND timestamp < CAST((?) as TIMESTAMP) ORDER BY timestamp DESC LIMIT (?);",
         )?;
         stmt.query_map(params![from, to, limit], |row| {
+            let payload: String = row.get(1)?;
             Ok(DataResponse {
                 timestamp: row.get(0)?,
-                payload: row.get(1)?,
+                payload: serde_json::from_str(&payload).unwrap(),
                 bucket: row.get(2)?,
             })
         })?
@@ -212,7 +214,7 @@ pub struct Data {
 pub struct DataResponse {
     timestamp: String,
     bucket: String,
-    payload: String,
+    payload: Value,
 }
 
 #[derive(Debug, Serialize)]

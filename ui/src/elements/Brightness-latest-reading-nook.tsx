@@ -6,7 +6,7 @@ const getData = async () => {
     `/api/data?bucket=brightness-barometer-living-room&limit=1`
   );
   const json = await response.json();
-  return JSON.parse(json?.[0]?.payload)?.lux;
+  return json?.[0]?.payload?.lux;
 };
 
 export const BrightnessLatestReadingNook = () => {

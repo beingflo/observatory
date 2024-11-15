@@ -11,11 +11,11 @@ use serde::{Deserialize, Serialize};
 use crate::{auth::AuthenticatedUser, error::AppError, AppState};
 
 #[tracing::instrument(skip_all)]
-pub async fn get_home_data(
+pub async fn get_co2(
     _: AuthenticatedUser,
     Query(filters): Query<GetHomeDataFilters>,
     State(state): State<AppState>,
-) -> Result<(StatusCode, Json<HomeDataResponse>), AppError> {
+) -> Result<(StatusCode, Json<CO2Response>), AppError> {
     let mut from = if let Some(f) = filters.from {
         Timestamp::from_str(&f)
             .map_err(|e| AppError::DateInputError(e))?
@@ -43,7 +43,7 @@ pub async fn get_home_data(
     let conn = state.connection.lock().await;
     let mut stmt = conn
         .prepare(
-            "SELECT cast(timestamp as Text), cast(payload -> '$.co2' as Integer), cast(payload -> '$.temperature' as Float), cast(payload -> '$.humidity' as Float) FROM timeseries WHERE bucket = 'co2-sensor-living-room' AND timestamp > CAST((?) as TIMESTAMP) AND timestamp < CAST((?) AS TIMESTAMP) ORDER BY timestamp ASC;",
+            "SELECT cast(timestamp as Text), cast(payload -> '$.co2' as Integer) FROM timeseries WHERE bucket = 'co2-sensor-living-room' AND timestamp > CAST((?) as TIMESTAMP) AND timestamp < CAST((?) AS TIMESTAMP) ORDER BY timestamp ASC;",
         )?;
 
     let data: Result<Vec<DataPoint>, _> = stmt
@@ -51,8 +51,6 @@ pub async fn get_home_data(
             Ok(DataPoint {
                 timestamp: row.get(0)?,
                 co2: row.get(1)?,
-                temperature: row.get(2)?,
-                humidity: row.get(3)?,
             })
         })?
         .collect();
@@ -63,7 +61,7 @@ pub async fn get_home_data(
         d.timestamp = Timestamp::from_str(&d.timestamp)?.to_string();
     }
 
-    Ok((StatusCode::OK, Json(HomeDataResponse { data })))
+    Ok((StatusCode::OK, Json(CO2Response { data })))
 }
 
 #[derive(Deserialize)]
@@ -74,7 +72,7 @@ pub struct GetHomeDataFilters {
 }
 
 #[derive(Debug, Serialize)]
-pub struct HomeDataResponse {
+pub struct CO2Response {
     data: Vec<DataPoint>,
 }
 
@@ -82,6 +80,4 @@ pub struct HomeDataResponse {
 pub struct DataPoint {
     timestamp: String,
     co2: u32,
-    temperature: f32,
-    humidity: f32,
 }

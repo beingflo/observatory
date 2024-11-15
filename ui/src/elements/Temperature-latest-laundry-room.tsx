@@ -6,7 +6,7 @@ const getData = async () => {
     `/api/data?bucket=humidity-laundry-room&limit=1`
   );
   const json = await response.json();
-  return JSON.parse(json?.[0]?.payload)?.temperature;
+  return json?.[0]?.payload?.temperature;
 };
 
 export const TemperatureLatestLaundryRoom = () => {
