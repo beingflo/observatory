@@ -4,30 +4,30 @@ import * as Plot from "@observablehq/plot";
 export type ChartProps = {
   plot: Plot.PlotOptions;
   loading: boolean;
+  id: string;
 };
 
 export const Chart = (props: ChartProps) => {
-  const [width, setWidth] = createSignal<{ width: number; height: number }>({
-    height: window.innerHeight,
-    width: window.innerWidth,
-  });
+  const [width, setWidth] = createSignal(0);
 
-  const handler = (_event: Event) => {
-    setWidth({ height: window.innerHeight, width: window.innerWidth });
+  const onResize = (entries: ResizeObserverEntry[]) => {
+    setWidth(entries[0].contentRect.width);
   };
 
+  const observer = new ResizeObserver(onResize);
+
   onMount(() => {
-    window.addEventListener("resize", handler);
+    observer.observe(document.getElementById(props.id)!);
   });
 
   onCleanup(() => {
-    window.removeEventListener("resize", handler);
+    observer.disconnect();
   });
 
   return (
-    <div class="w-full">
+    <div id={props.id} class="w-full">
       <Show when={!props.loading}>
-        {Plot.plot({ width: width().width, ...props.plot })}
+        {Plot.plot({ width: width(), ...props.plot })}
       </Show>
     </div>
   );

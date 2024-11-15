@@ -22,6 +22,7 @@ const HomeData = () => {
       <div class="text-xl font-bold pb-8">Home</div>
       <div class="w-full">
         <Chart
+          id="co2"
           loading={!data()}
           plot={{
             y: {
