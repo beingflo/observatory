@@ -5,6 +5,7 @@ import { CO2LatestLivingRoom } from "../elements/CO2-latest-living-room";
 import { CO2LivingRoom } from "../elements/CO2-living-room";
 import { HumidityLatestLaundryRoom } from "../elements/Humidity-latest-laundry-room";
 import { HumidityLatestLivingRoom } from "../elements/Humidity-latest-living-room";
+import { TemperatureLatestLaundryRoom } from "../elements/Temperature-latest-laundry-room";
 import { TemperatureLatestLivingRoom } from "../elements/Temperature-latest-living-room";
 
 export const Home = () => {
@@ -24,6 +25,9 @@ export const Home = () => {
           </div>
           <div class="w-48">
             <TemperatureLatestLivingRoom />
+          </div>
+          <div class="w-48">
+            <TemperatureLatestLaundryRoom />
           </div>
           <div class="w-48">
             <BrightnessLatestReadingNook />

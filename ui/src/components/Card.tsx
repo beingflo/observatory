@@ -10,7 +10,7 @@ export const Card = (props: CardProps) => {
 
   return (
     <div class="p-4 border bg-white rounded-md">
-      <div class="mb-4 text-center">{props.title}</div>
+      <div class="mb-4 text-center text-sm">{props.title}</div>
       {ch()}
     </div>
   );
