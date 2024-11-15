@@ -1,4 +1,4 @@
-use std::{collections::HashMap, str::FromStr};
+use std::{collections::HashMap, str::FromStr, u32};
 
 use axum::{
     extract::{Path, Query, State},
@@ -47,7 +47,7 @@ pub async fn get_data(
             .to_string();
     }
 
-    let limit = filters.limit.unwrap_or(10000);
+    let limit = filters.limit.unwrap_or(u32::MAX);
 
     let conn = state.connection.lock().await;
     let mut stmt;
