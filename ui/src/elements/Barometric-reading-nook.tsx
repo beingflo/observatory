@@ -8,30 +8,31 @@ const fetchData = async (hours: number) => {
   now.setHours(now.getHours() - hours);
 
   const response = await fetch(
-    `/api/data?bucket=humidity-laundry-room&from=${now.toISOString()}`
+    `/api/data?bucket=brightness-barometer-living-room&from=${now.toISOString()}`
   );
   return response.json();
 };
 
-export const HumidityLaundryRoom = () => {
-  const [data, { refetch }] = createResource(() => fetchData(48));
+export const BarometricReadingNook = () => {
+  const [data, { refetch }] = createResource(() => fetchData(24));
 
   setTimeout(() => refetch(), 30000);
 
   return (
-    <Card title="Humidity laundry room">
+    <Card title="Barometric pressure">
       <Chart
-        id="humdity-laundry-room"
+        id="barometric-pressure-reading-nook"
         loading={!data()}
         plot={{
           y: {
             grid: true,
-            label: "Humidity [%]",
+            label: "pressure [hPA]",
           },
+          marginLeft: 50,
           marks: [
             Plot.lineY(data(), {
               x: (d) => new Date(d.timestamp),
-              y: (d) => d.payload.humidity,
+              y: (d) => d.payload.pressure,
             }),
           ],
         }}

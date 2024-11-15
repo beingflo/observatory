@@ -1,5 +1,6 @@
 import { Dashboard } from "../components/Dashboard";
 import { BarometricLatestReadingNook } from "../elements/Barometric-latest-reading-nook";
+import { BarometricReadingNook } from "../elements/Barometric-reading-nook";
 import { BrightnessLatestReadingNook } from "../elements/Brightness-latest-reading-nook";
 import { CO2LatestLivingRoom } from "../elements/CO2-latest-living-room";
 import { CO2LivingRoom } from "../elements/CO2-living-room";
@@ -9,6 +10,7 @@ import { HumidityLaundryRoom } from "../elements/Humidity-laundry-room";
 import { HumidityLivingRoom } from "../elements/Humidity-living-room";
 import { TemperatureLatestLaundryRoom } from "../elements/Temperature-latest-laundry-room";
 import { TemperatureLatestLivingRoom } from "../elements/Temperature-latest-living-room";
+import { TemperatureLivingRoom } from "../elements/Temperature-living-room";
 
 export const Home = () => {
   return (
@@ -28,6 +30,8 @@ export const Home = () => {
           <HumidityLivingRoom />
         </div>
         <HumidityLaundryRoom />
+        <TemperatureLivingRoom />
+        <BarometricReadingNook />
       </div>
     </Dashboard>
   );

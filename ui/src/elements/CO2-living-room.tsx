@@ -26,6 +26,7 @@ export const CO2LivingRoom = () => {
         plot={{
           y: {
             grid: true,
+            label: "CO2 [ppm]",
           },
           marks: [
             Plot.lineY(data(), {

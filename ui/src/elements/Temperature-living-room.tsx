@@ -8,30 +8,30 @@ const fetchData = async (hours: number) => {
   now.setHours(now.getHours() - hours);
 
   const response = await fetch(
-    `/api/data?bucket=humidity-laundry-room&from=${now.toISOString()}`
+    `/api/data?bucket=co2-sensor-living-room&from=${now.toISOString()}`
   );
   return response.json();
 };
 
-export const HumidityLaundryRoom = () => {
-  const [data, { refetch }] = createResource(() => fetchData(48));
+export const TemperatureLivingRoom = () => {
+  const [data, { refetch }] = createResource(() => fetchData(24));
 
   setTimeout(() => refetch(), 30000);
 
   return (
-    <Card title="Humidity laundry room">
+    <Card title="Temperature living room">
       <Chart
-        id="humdity-laundry-room"
+        id="temperature-living-room"
         loading={!data()}
         plot={{
           y: {
             grid: true,
-            label: "Humidity [%]",
+            label: "Temperature [°C]",
           },
           marks: [
             Plot.lineY(data(), {
               x: (d) => new Date(d.timestamp),
-              y: (d) => d.payload.humidity,
+              y: (d) => d.payload.temperature,
             }),
           ],
         }}

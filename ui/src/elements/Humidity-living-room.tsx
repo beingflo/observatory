@@ -26,6 +26,7 @@ export const HumidityLivingRoom = () => {
         plot={{
           y: {
             grid: true,
+            label: "Humidity [%]",
           },
           marks: [
             Plot.lineY(data(), {
