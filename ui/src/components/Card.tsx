@@ -1,8 +1,8 @@
 import { children, JSX } from "solid-js";
 
 export type CardProps = {
-  children: JSX.Element;
   title: string;
+  children: JSX.Element;
 };
 
 export const Card = (props: CardProps) => {
@@ -10,7 +10,7 @@ export const Card = (props: CardProps) => {
 
   return (
     <div class="p-4 border bg-white rounded-xl">
-      <div class="mb-4">{props.title}</div>
+      <div class="mb-4 text-center">{props.title}</div>
       {ch()}
     </div>
   );

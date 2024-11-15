@@ -10,7 +10,7 @@ export const Dashboard = (props: DashboardProps) => {
 
   return (
     <div class="bg-slate-100 p-8 w-full h-screen flex flex-col">
-      <h1 class="font-extrabold text-xl mb-12">{props.title}</h1>
+      <h1 class="font-serif text-4xl mb-12">{props.title}</h1>
       {ch()}
     </div>
   );
