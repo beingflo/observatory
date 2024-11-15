@@ -5,7 +5,7 @@ import App from "./App";
 import "./index.css";
 import { Route, Router } from "@solidjs/router";
 import Weight from "./dashboards/Weight";
-import HomeData from "./dashboards/HomeData";
+import { Home } from "./dashboards/Home";
 
 const root = document.getElementById("root");
 
@@ -15,7 +15,7 @@ render(
       <Router>
         <Route path="/" component={App} />
         <Route path="/weight" component={Weight} />
-        <Route path="/home" component={HomeData} />
+        <Route path="/home" component={Home} />
       </Router>
     </>
   ),

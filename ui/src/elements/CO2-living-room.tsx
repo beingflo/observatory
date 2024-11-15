@@ -14,31 +14,24 @@ const fetchHomeData = async (hours?: number) => {
   }
 };
 
-const HomeData = () => {
+export const CO2LivingRoom = () => {
   const [data] = createResource(() => fetchHomeData(6));
 
   return (
-    <div class="p-8">
-      <div class="text-xl font-bold pb-8">Home</div>
-      <div class="w-full">
-        <Chart
-          id="co2"
-          loading={!data()}
-          plot={{
-            y: {
-              grid: true,
-            },
-            marks: [
-              Plot.lineY(data()?.data, {
-                x: (d) => new Date(d.timestamp),
-                y: "co2",
-              }),
-            ],
-          }}
-        />
-      </div>
-    </div>
+    <Chart
+      id="co2"
+      loading={!data()}
+      plot={{
+        y: {
+          grid: true,
+        },
+        marks: [
+          Plot.lineY(data()?.data, {
+            x: (d) => new Date(d.timestamp),
+            y: "co2",
+          }),
+        ],
+      }}
+    />
   );
 };
-
-export default HomeData;
