@@ -28,6 +28,9 @@ export const BarometricReadingNook = () => {
             grid: true,
             label: "pressure [hPA]",
           },
+          x: {
+            type: "time",
+          },
           marginLeft: 50,
           marks: [
             Plot.lineY(data(), {

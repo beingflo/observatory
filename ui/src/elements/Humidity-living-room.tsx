@@ -28,6 +28,9 @@ export const HumidityLivingRoom = () => {
             grid: true,
             label: "Humidity [%]",
           },
+          x: {
+            type: "time",
+          },
           marks: [
             Plot.lineY(data(), {
               x: (d) => new Date(d.timestamp),

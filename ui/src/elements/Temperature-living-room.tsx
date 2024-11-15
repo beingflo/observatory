@@ -28,6 +28,9 @@ export const TemperatureLivingRoom = () => {
             grid: true,
             label: "Temperature [°C]",
           },
+          x: {
+            type: "time",
+          },
           marks: [
             Plot.lineY(data(), {
               x: (d) => new Date(d.timestamp),

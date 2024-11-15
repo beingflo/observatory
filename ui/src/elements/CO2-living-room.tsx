@@ -28,7 +28,16 @@ export const CO2LivingRoom = () => {
             grid: true,
             label: "CO2 [ppm]",
           },
+          x: {
+            type: "time",
+          },
           marks: [
+            Plot.areaY(data(), {
+              x: (d) => new Date(d.timestamp),
+              y: (d) => d.payload.co2,
+              fill: "orange",
+              fillOpacity: 0.1,
+            }),
             Plot.lineY(data(), {
               x: (d) => new Date(d.timestamp),
               y: (d) => d.payload.co2,
