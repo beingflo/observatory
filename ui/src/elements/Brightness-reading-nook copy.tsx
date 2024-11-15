@@ -27,6 +27,9 @@ export const BrightnessReadingNook = () => {
             grid: true,
             label: "Brightness [lux]",
           },
+          x: {
+            type: "time",
+          },
           marginLeft: 50,
           marks: [
             Plot.lineY(data(), {
