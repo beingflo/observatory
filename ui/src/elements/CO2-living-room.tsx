@@ -2,19 +2,18 @@ import { createResource } from "solid-js";
 import * as Plot from "@observablehq/plot";
 import { Chart } from "../components/Chart";
 import { Card } from "../components/Card";
+import { useRange } from "../components/RangeProvider";
 
-const fetchData = async (hours: number) => {
-  const now = new Date();
-  now.setHours(now.getHours() - hours);
-
+const fetchData = async (from: string) => {
   const response = await fetch(
-    `/api/data?bucket=co2-sensor-living-room&from=${now.toISOString()}`
+    `/api/data?bucket=co2-sensor-living-room&from=${from}`
   );
   return response.json();
 };
 
 export const CO2LivingRoom = () => {
-  const [data, { refetch }] = createResource(() => fetchData(24));
+  const [{ from }] = useRange();
+  const [data, { refetch }] = createResource(from, () => fetchData(from()));
 
   setTimeout(() => refetch(), 30000);
 
@@ -35,10 +34,6 @@ export const CO2LivingRoom = () => {
             Plot.lineY(data(), {
               x: (d) => new Date(d.timestamp),
               y: (d) => d.payload.co2,
-            }),
-            Plot.ruleY([1000], {
-              stroke: "orange",
-              strokeDasharray: "5 5",
             }),
           ],
         }}
