@@ -7,12 +7,15 @@ use axum::{
     Router,
 };
 use buckets::get_distinct_buckets;
-use dashboards::{home_data::get_home_data, observatory::get_observatory_info, weight::get_weight};
 use data::{delete_data, get_data, upload_data, upload_data_url_only};
 use duckdb::Connection;
 use emitters::{add_emitter, delete_emitter, get_emitters};
+use endpoints::{
+    location::get_gps_coords, observatory::get_observatory_info, sensors::get_home_data,
+    weight::get_weight,
+};
 use error::AppError;
-use gps::{get_gps_coords, upload_gps_data};
+use gps::upload_gps_data;
 use migration::apply_migrations;
 use spa::static_handler;
 use tokio::{signal, sync::Mutex};
@@ -22,9 +25,9 @@ use uuid::Uuid;
 
 mod auth;
 mod buckets;
-mod dashboards;
 mod data;
 mod emitters;
+mod endpoints;
 mod error;
 mod gps;
 mod migration;
