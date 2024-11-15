@@ -32,15 +32,13 @@ export const CO2LivingRoom = () => {
             type: "time",
           },
           marks: [
-            Plot.areaY(data(), {
-              x: (d) => new Date(d.timestamp),
-              y: (d) => d.payload.co2,
-              fill: "orange",
-              fillOpacity: 0.1,
-            }),
             Plot.lineY(data(), {
               x: (d) => new Date(d.timestamp),
               y: (d) => d.payload.co2,
+            }),
+            Plot.ruleY([1000], {
+              stroke: "orange",
+              strokeDasharray: "5 5",
             }),
           ],
         }}
