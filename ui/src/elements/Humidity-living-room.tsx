@@ -13,15 +13,15 @@ const fetchData = async (hours: number) => {
   return response.json();
 };
 
-export const CO2LivingRoom = () => {
+export const HumidityLivingRoom = () => {
   const [data, { refetch }] = createResource(() => fetchData(24));
 
   setTimeout(() => refetch(), 30000);
 
   return (
-    <Card title="CO2 living room">
+    <Card title="Humidity living room">
       <Chart
-        id="co2-living-room"
+        id="humdity-living-room"
         loading={!data()}
         plot={{
           y: {
@@ -30,7 +30,7 @@ export const CO2LivingRoom = () => {
           marks: [
             Plot.lineY(data(), {
               x: (d) => new Date(d.timestamp),
-              y: (d) => d.payload.co2,
+              y: (d) => d.payload.humidity,
             }),
           ],
         }}

@@ -8,20 +8,20 @@ const fetchData = async (hours: number) => {
   now.setHours(now.getHours() - hours);
 
   const response = await fetch(
-    `/api/data?bucket=co2-sensor-living-room&from=${now.toISOString()}`
+    `/api/data?bucket=humidity-laundry-room&from=${now.toISOString()}`
   );
   return response.json();
 };
 
-export const CO2LivingRoom = () => {
-  const [data, { refetch }] = createResource(() => fetchData(24));
+export const HumidityLaundryRoom = () => {
+  const [data, { refetch }] = createResource(() => fetchData(48));
 
   setTimeout(() => refetch(), 30000);
 
   return (
-    <Card title="CO2 living room">
+    <Card title="Humidity laundry room">
       <Chart
-        id="co2-living-room"
+        id="humdity-laundry-room"
         loading={!data()}
         plot={{
           y: {
@@ -30,7 +30,7 @@ export const CO2LivingRoom = () => {
           marks: [
             Plot.lineY(data(), {
               x: (d) => new Date(d.timestamp),
-              y: (d) => d.payload.co2,
+              y: (d) => d.payload.humidity,
             }),
           ],
         }}
