@@ -3,6 +3,7 @@ import * as Plot from "@observablehq/plot";
 import { Chart } from "../../components/Chart";
 import { Card } from "../../components/Card";
 import { useRange } from "../../components/RangeProvider";
+import { getDate } from "../../components/DateRangeSelector";
 
 const fetchData = async (from: string) => {
   const response = await fetch(
@@ -13,7 +14,9 @@ const fetchData = async (from: string) => {
 
 export const BarometricReadingNook = () => {
   const [{ from }] = useRange();
-  const [data, { refetch }] = createResource(from, () => fetchData(from()));
+  const [data, { refetch }] = createResource(from, () =>
+    fetchData(getDate(from()))
+  );
 
   setTimeout(() => refetch(), 30000);
 

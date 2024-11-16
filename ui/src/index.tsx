@@ -10,12 +10,9 @@ import { RangeProvider } from "./components/RangeProvider";
 
 const root = document.getElementById("root");
 
-const now = new Date();
-now.setHours(now.getHours() - 24);
-
 render(
   () => (
-    <RangeProvider from={now.toISOString()}>
+    <RangeProvider from="1d">
       <Router>
         <Route path="/" component={App} />
         <Route path="/weight" component={Weight} />
