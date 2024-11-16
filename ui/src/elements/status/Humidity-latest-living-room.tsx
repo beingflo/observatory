@@ -1,5 +1,6 @@
 import { createResource } from "solid-js";
 import { Status } from "../../components/Status";
+import { getRandomInRange } from "../../components/utils";
 
 const getData = async () => {
   const response = await fetch(
@@ -14,7 +15,10 @@ export const HumidityLatestLivingRoom = () => {
     initialValue: 0,
   });
 
-  setTimeout(() => refetch(), 30000);
+  setTimeout(() => {
+    refetch();
+    setInterval(() => refetch(), 30000);
+  }, getRandomInRange(0, 30000));
 
   return <Status title="Current humidity" content={`${data()} %`} />;
 };
