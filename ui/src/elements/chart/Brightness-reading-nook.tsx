@@ -7,7 +7,7 @@ import { getDate } from "../../components/DateRangeSelector";
 
 const fetchData = async (from: string) => {
   const response = await fetch(
-    `/api/data?bucket=brightness-barometer-living-room&from=${from}`
+    `/api/data?bucket=brightness-barometer-living-room&sample=1000&from=${from}`
   );
   return response.json();
 };

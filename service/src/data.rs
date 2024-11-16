@@ -14,6 +14,7 @@ use tracing::info;
 use crate::{
     auth::{AuthenticatedEmitter, AuthenticatedUser},
     error::AppError,
+    utils::sample,
     AppState,
 };
 
@@ -89,7 +90,7 @@ pub async fn get_data(
         d.timestamp = Timestamp::from_str(&d.timestamp)?.to_string();
     }
 
-    Ok((StatusCode::OK, Json(response)))
+    Ok((StatusCode::OK, Json(sample(filters.sample, response))))
 }
 
 #[tracing::instrument(skip_all)]
@@ -190,8 +191,13 @@ pub async fn upload_data_url_only(
 pub struct GetDataFilters {
     from: Option<String>,
     to: Option<String>,
+    // past_days overrides `from` and `to` params
     past_days: Option<u32>,
+    // return only last `limit` datapoints
     limit: Option<u32>,
+    // sample at most ~`sample` datapoints from all otherwise returned
+    sample: Option<u32>,
+    // filter down datapoints to ones in `bucket`
     bucket: Option<String>,
 }
 
