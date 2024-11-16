@@ -1,6 +1,7 @@
 use axum::{
     extract::{Path, State},
     http::StatusCode,
+    Json,
 };
 use serde::Serialize;
 
@@ -11,7 +12,7 @@ pub async fn get_gps_coords(
     State(state): State<AppState>,
     _: AuthenticatedUser,
     Path(bucket): Path<String>,
-) -> Result<(StatusCode, String), AppError> {
+) -> Result<(StatusCode, Json<Vec<GPSResponse>>), AppError> {
     let conn = state.connection.lock().await;
     let mut stmt = conn
         .prepare("SELECT cast(payload -> '$.geometry.coordinates[0]' as float), cast(payload -> '$.geometry.coordinates[1]' as float) FROM timeseries WHERE bucket = (?) ORDER BY timestamp DESC;")?;
@@ -25,14 +26,7 @@ pub async fn get_gps_coords(
         })?
         .collect();
 
-    Ok((
-        StatusCode::OK,
-        response?
-            .into_iter()
-            .map(|r| format!("{}, {}", r.latitude, r.longitude))
-            .collect::<Vec<String>>()
-            .join("\n"),
-    ))
+    Ok((StatusCode::OK, Json(response?)))
 }
 
 #[derive(Debug, Serialize)]
