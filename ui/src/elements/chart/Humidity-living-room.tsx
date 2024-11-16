@@ -1,8 +1,8 @@
 import { createResource } from "solid-js";
 import * as Plot from "@observablehq/plot";
-import { Chart } from "../components/Chart";
-import { Card } from "../components/Card";
-import { useRange } from "../components/RangeProvider";
+import { Chart } from "../../components/Chart";
+import { Card } from "../../components/Card";
+import { useRange } from "../../components/RangeProvider";
 
 const fetchData = async (from: string) => {
   const response = await fetch(
@@ -11,21 +11,21 @@ const fetchData = async (from: string) => {
   return response.json();
 };
 
-export const CO2LivingRoom = () => {
+export const HumidityLivingRoom = () => {
   const [{ from }] = useRange();
   const [data, { refetch }] = createResource(from, () => fetchData(from()));
 
   setTimeout(() => refetch(), 30000);
 
   return (
-    <Card title="CO2 living room">
+    <Card title="Humidity living room">
       <Chart
-        id="co2-living-room"
-        loading={!data()}
+        id="humdity-living-room"
+        loading={data.loading}
         plot={{
           y: {
             grid: true,
-            label: "CO2 [ppm]",
+            label: "Humidity [%]",
           },
           x: {
             type: "time",
@@ -33,7 +33,7 @@ export const CO2LivingRoom = () => {
           marks: [
             Plot.lineY(data(), {
               x: (d) => new Date(d.timestamp),
-              y: (d) => d.payload.co2,
+              y: (d) => d.payload.humidity,
             }),
           ],
         }}

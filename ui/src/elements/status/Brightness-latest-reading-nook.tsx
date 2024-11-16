@@ -1,5 +1,5 @@
 import { createResource } from "solid-js";
-import { Status } from "../components/Status";
+import { Status } from "../../components/Status";
 
 const getData = async () => {
   const response = await fetch(

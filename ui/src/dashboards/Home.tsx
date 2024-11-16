@@ -1,17 +1,17 @@
 import { Dashboard } from "../components/Dashboard";
-import { BarometricLatestReadingNook } from "../elements/Barometric-latest-reading-nook";
-import { BarometricReadingNook } from "../elements/Barometric-reading-nook";
-import { BrightnessLatestReadingNook } from "../elements/Brightness-latest-reading-nook";
-import { BrightnessReadingNook } from "../elements/Brightness-reading-nook copy";
-import { CO2LatestLivingRoom } from "../elements/CO2-latest-living-room";
-import { CO2LivingRoom } from "../elements/CO2-living-room";
-import { HumidityLatestLaundryRoom } from "../elements/Humidity-latest-laundry-room";
-import { HumidityLatestLivingRoom } from "../elements/Humidity-latest-living-room";
-import { HumidityLaundryRoom } from "../elements/Humidity-laundry-room";
-import { HumidityLivingRoom } from "../elements/Humidity-living-room";
-import { TemperatureLatestLaundryRoom } from "../elements/Temperature-latest-laundry-room";
-import { TemperatureLatestLivingRoom } from "../elements/Temperature-latest-living-room";
-import { TemperatureLivingRoom } from "../elements/Temperature-living-room";
+import { BarometricReadingNook } from "../elements/chart/Barometric-reading-nook";
+import { BrightnessReadingNook } from "../elements/chart/Brightness-reading-nook";
+import { CO2LivingRoom } from "../elements/chart/CO2-living-room";
+import { HumidityLaundryRoom } from "../elements/chart/Humidity-laundry-room";
+import { HumidityLivingRoom } from "../elements/chart/Humidity-living-room";
+import { TemperatureLivingRoom } from "../elements/chart/Temperature-living-room";
+import { BarometricLatestReadingNook } from "../elements/status/Barometric-latest-reading-nook";
+import { BrightnessLatestReadingNook } from "../elements/status/Brightness-latest-reading-nook";
+import { CO2LatestLivingRoom } from "../elements/status/CO2-latest-living-room";
+import { HumidityLatestLaundryRoom } from "../elements/status/Humidity-latest-laundry-room";
+import { HumidityLatestLivingRoom } from "../elements/status/Humidity-latest-living-room";
+import { TemperatureLatestLaundryRoom } from "../elements/status/Temperature-latest-laundry-room";
+import { TemperatureLatestLivingRoom } from "../elements/status/Temperature-latest-living-room";
 
 export const Home = () => {
   return (

@@ -1,8 +1,8 @@
 import { createResource } from "solid-js";
 import * as Plot from "@observablehq/plot";
-import { Chart } from "../components/Chart";
-import { Card } from "../components/Card";
-import { useRange } from "../components/RangeProvider";
+import { Chart } from "../../components/Chart";
+import { Card } from "../../components/Card";
+import { useRange } from "../../components/RangeProvider";
 
 const fetchData = async (from: string) => {
   const response = await fetch(
@@ -21,7 +21,7 @@ export const HumidityLaundryRoom = () => {
     <Card title="Humidity laundry room">
       <Chart
         id="humdity-laundry-room"
-        loading={!data()}
+        loading={data.loading}
         plot={{
           y: {
             grid: true,
