@@ -43,12 +43,6 @@ export const BrightnessReadingNook = () => {
               x: (d) => new Date(d.timestamp),
               y: (d) => d.payload.lux,
             }),
-            Plot.areaY(data(), {
-              x: (d) => new Date(d.timestamp),
-              y: (d) => d.payload.lux,
-              fill: "orange",
-              fillOpacity: 0.2,
-            }),
           ],
         }}
       />
