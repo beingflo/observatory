@@ -22,7 +22,7 @@ use crate::{
 pub async fn get_data(
     State(state): State<AppState>,
     _: AuthenticatedUser,
-    Query(filters): Query<GetDataFilters>,
+    Query(filters): Query<DataFilter>,
 ) -> Result<(StatusCode, Json<Vec<DataResponse>>), AppError> {
     let mut from = if let Some(f) = filters.from {
         Timestamp::from_str(&f)
@@ -188,7 +188,7 @@ pub async fn upload_data_url_only(
 }
 
 #[derive(Deserialize)]
-pub struct GetDataFilters {
+pub struct DataFilter {
     from: Option<String>,
     to: Option<String>,
     // past_days overrides `from` and `to` params
