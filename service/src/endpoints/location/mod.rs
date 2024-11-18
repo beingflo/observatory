@@ -37,13 +37,14 @@ pub async fn get_gps_coords(
 
     let conn = state.connection.lock().await;
     let mut stmt = conn
-        .prepare("SELECT cast(payload -> '$.geometry.coordinates[0]' as float), cast(payload -> '$.geometry.coordinates[1]' as float) FROM timeseries WHERE bucket = (?) AND timestamp > CAST((?) as TIMESTAMP) AND timestamp < CAST((?) as TIMESTAMP) ORDER BY timestamp DESC LIMIT (?);")?;
+        .prepare("SELECT cast(payload -> '$.geometry.coordinates[0]' as float), cast(payload -> '$.geometry.coordinates[1]' as float), cast(timestamp as Text) FROM timeseries WHERE bucket = (?) AND timestamp > CAST((?) as TIMESTAMP) AND timestamp < CAST((?) as TIMESTAMP) ORDER BY timestamp DESC LIMIT (?);")?;
 
     let response: Result<Vec<GPSResponse>, _> = stmt
         .query_map(params![bucket, from, to, limit], |row| {
             Ok(GPSResponse {
                 longitude: row.get(0)?,
                 latitude: row.get(1)?,
+                timestamp: row.get(2)?,
             })
         })?
         .collect();
@@ -55,6 +56,7 @@ pub async fn get_gps_coords(
 pub struct GPSResponse {
     longitude: f64,
     latitude: f64,
+    timestamp: String,
 }
 
 #[derive(Deserialize)]
