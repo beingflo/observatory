@@ -29,11 +29,11 @@ export const Home = () => {
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <CO2LivingRoom />
           <HumidityLivingRoom />
+          <HumidityLaundryRoom />
+          <TemperatureLivingRoom />
+          <BarometricReadingNook />
+          <BrightnessReadingNook />
         </div>
-        <HumidityLaundryRoom />
-        <TemperatureLivingRoom />
-        <BarometricReadingNook />
-        <BrightnessReadingNook />
       </div>
     </Dashboard>
   );
