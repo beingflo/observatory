@@ -3,7 +3,6 @@ import * as Plot from "@observablehq/plot";
 import { Chart } from "../../components/Chart";
 import { Card } from "../../components/Card";
 import { useRange } from "../../components/RangeProvider";
-import { getDate } from "../../components/DateRangeSelector";
 import { getRandomInRange } from "../../components/utils";
 
 const fetchData = async (from: string) => {
@@ -15,9 +14,7 @@ const fetchData = async (from: string) => {
 
 export const BrightnessReadingNook = () => {
   const [{ from }] = useRange();
-  const [data, { refetch }] = createResource(from, () =>
-    fetchData(getDate(from()))
-  );
+  const [data, { refetch }] = createResource(from, () => fetchData(from()));
 
   setTimeout(() => {
     refetch();

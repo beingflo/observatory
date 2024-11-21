@@ -28,7 +28,7 @@ export const getDate = (option: string): string => {
 };
 
 export const DateRangeSelector = () => {
-  const [{ from }, { setFrom }] = useRange();
+  const [{ fromOption }, { setFromOption }] = useRange();
 
   const options = ["1y", "6m", "30d", "7d", "1d", "6h"];
 
@@ -36,10 +36,10 @@ export const DateRangeSelector = () => {
     <div class="h-fit flex flex-row gap-2">
       <For each={options}>
         {(item) => (
-          <button onClick={() => setFrom(item)}>
+          <button onClick={() => setFromOption(item)}>
             <div
               class={`text-sm px-2 pb-0.5 flex justify-center items-center text-gray-600 rounded-sm ${
-                from() === item && "bg-white border border-black"
+                fromOption() === item && "bg-white border border-black"
               }`}
             >
               {item}

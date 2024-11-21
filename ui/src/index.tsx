@@ -13,7 +13,7 @@ const root = document.getElementById("root");
 
 render(
   () => (
-    <RangeProvider from="1d">
+    <RangeProvider fromOption="6h">
       <Router>
         <Route path="/" component={App} />
         <Route path="/home" component={Home} />
