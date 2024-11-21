@@ -11,8 +11,8 @@ export const Dashboard = (props: DashboardProps) => {
 
   return (
     <div class="bg-stone-100 p-8 w-full h-full flex flex-col">
-      <div class="flex flex-row justify-between">
-        <a href="/" class="text-6xl mb-12">
+      <div class="flex flex-col md:flex-row mb-4 justify-between">
+        <a href="/" class="text-6xl md:mb-8 mb-2">
           {props.title}
         </a>
         <DateRangeSelector />
