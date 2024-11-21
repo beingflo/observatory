@@ -4,14 +4,16 @@ import { dashboards } from "./dashboards";
 function App() {
   return (
     <div>
-      <div class="text-xl font-bold p-8">Observatory</div>
-      <For each={dashboards}>
-        {(item) => (
-          <div class="flex flex-row gap-8 px-8">
-            <a href={item.target}>{item.title}</a>
-          </div>
-        )}
-      </For>
+      <div class="text-6xl p-2 md:p-6 md:mb-8 mb-2">Observatory</div>
+      <div class="flex flex-row gap-8 px-8">
+        <For each={dashboards}>
+          {(item) => (
+            <a href={item.target}>
+              <p class="text-2xl">{item.title}</p>
+            </a>
+          )}
+        </For>
+      </div>
     </div>
   );
 }
