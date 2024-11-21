@@ -2,7 +2,6 @@ import { createMemo, createResource, createSignal } from "solid-js";
 import { Dashboard } from "../components/Dashboard";
 import MapGL, { Layer, Source, Viewport } from "solid-map-gl";
 import { useRange } from "../components/RangeProvider";
-import { getDate } from "../components/DateRangeSelector";
 
 const fetchData = async (from?: string) => {
   const response = await fetch(`/api/gps/location_florian?from=${from}`);
@@ -16,7 +15,7 @@ export const Location = () => {
     zoom: 13,
   } as Viewport);
 
-  const [data] = createResource(from, () => fetchData(getDate(from())));
+  const [data] = createResource(from, () => fetchData(from()));
 
   const geoJson = createMemo(() => ({
     type: "Feature",
