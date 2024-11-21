@@ -5,7 +5,7 @@ function App() {
   return (
     <div>
       <div class="text-6xl p-2 md:p-6 md:mb-8 mb-2">Observatory</div>
-      <div class="flex flex-row gap-8 px-8">
+      <div class="flex flex-row gap-8 px-3 md:px-6">
         <For each={dashboards}>
           {(item) => (
             <a href={item.target}>
