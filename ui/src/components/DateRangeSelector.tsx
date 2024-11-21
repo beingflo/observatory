@@ -38,8 +38,8 @@ export const DateRangeSelector = () => {
         {(item) => (
           <button onClick={() => setFrom(item)}>
             <div
-              class={`text-sm px-2 pb-0.5 flex justify-center items-center border border-gray-100 text-gray-600 rounded-sm ${
-                from() === item && "bg-white border-slate-300"
+              class={`text-sm px-2 pb-0.5 flex justify-center items-center text-gray-600 rounded-sm ${
+                from() === item && "bg-white border border-black"
               }`}
             >
               {item}
