@@ -5,16 +5,19 @@ import { Card } from "../../components/Card";
 import { useRange } from "../../components/RangeProvider";
 import { getRandomInRange } from "../../components/utils";
 
-const fetchData = async (from: string) => {
+const fetchData = async (from: string, to: string) => {
   const response = await fetch(
-    `/api/data?bucket=co2-sensor-living-room&sample=1000&from=${from}`
+    `/api/data?bucket=co2-sensor-living-room&sample=1000&from=${from}&to=${to}`
   );
   return response.json();
 };
 
 export const CO2LivingRoom = () => {
-  const [{ from }] = useRange();
-  const [data, { refetch }] = createResource(from, () => fetchData(from()));
+  const [{ from, to }] = useRange();
+  const [data, { refetch }] = createResource(
+    () => [from(), to()],
+    () => fetchData(from(), to())
+  );
 
   setTimeout(() => {
     refetch();
