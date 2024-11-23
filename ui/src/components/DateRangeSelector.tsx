@@ -1,4 +1,4 @@
-import { For, Show } from "solid-js";
+import { For, Show, untrack } from "solid-js";
 import { useRange } from "./RangeProvider";
 
 export const getDate = (option: string): string => {
@@ -64,7 +64,7 @@ export const DateRangeSelector = () => {
             onInput={(event) =>
               setFrom(new Date(event?.currentTarget.value).toISOString())
             }
-            value={from()?.split(".")[0]}
+            value={untrack(() => from()?.split(".")[0])}
           />
           <input
             class="text-sm font-light text-center col-span-1"
@@ -73,7 +73,7 @@ export const DateRangeSelector = () => {
             onInput={(event) =>
               setTo(new Date(event?.currentTarget.value).toISOString())
             }
-            value={to()?.split(".")[0]}
+            value={untrack(() => to()?.split(".")[0])}
           />
         </div>
       </Show>

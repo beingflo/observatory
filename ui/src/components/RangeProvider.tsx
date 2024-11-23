@@ -10,7 +10,7 @@ export type RangeProviderProps = {
 
 export function RangeProvider(props: RangeProviderProps) {
   const [fromOption, setFromOption] = createSignal(props.fromOption);
-  const [to, setTo] = createSignal();
+  const [to, setTo] = createSignal(new Date().toISOString());
   const [customFrom, setCustomFrom] = createSignal(getDate(props.fromOption));
 
   const from = () => {
