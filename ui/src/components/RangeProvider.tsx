@@ -6,20 +6,31 @@ const DateRangeContext = createContext();
 export type RangeProviderProps = {
   children: JSX.Element;
   fromOption: string;
-  to?: string;
 };
 
 export function RangeProvider(props: RangeProviderProps) {
   const [fromOption, setFromOption] = createSignal(props.fromOption);
-  const [to, setTo] = createSignal(props.to);
+  const [to, setTo] = createSignal();
+  const [customFrom, setCustomFrom] = createSignal(getDate(props.fromOption));
 
-  const from = () => getDate(fromOption());
+  const from = () => {
+    if (fromOption() === "C") {
+      return customFrom();
+    }
+    return getDate(fromOption());
+  };
 
   const range = [
     { fromOption, from, to },
     {
       setFromOption(from: string) {
         setFromOption(from);
+        if (from !== "C") {
+          setCustomFrom(getDate(from));
+        }
+      },
+      setFrom(from: string) {
+        setCustomFrom(from);
       },
       setTo(to: string) {
         setTo(to);

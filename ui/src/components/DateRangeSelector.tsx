@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import { useRange } from "./RangeProvider";
 
 export const getDate = (option: string): string => {
@@ -28,25 +28,55 @@ export const getDate = (option: string): string => {
 };
 
 export const DateRangeSelector = () => {
-  const [{ fromOption }, { setFromOption }] = useRange();
+  const [{ fromOption, from, to }, { setFromOption, setFrom, setTo }] =
+    useRange();
 
-  const options = ["1y", "6m", "30d", "7d", "1d", "6h"];
+  const options = ["1y", "6m", "30d", "7d", "1d", "6h", "C"];
 
   return (
-    <div class="h-fit flex flex-row gap-2">
-      <For each={options}>
-        {(item) => (
-          <button onClick={() => setFromOption(item)}>
-            <div
-              class={`text-sm px-2 pb-0.5 flex justify-center items-center text-gray-600 rounded-sm ${
-                fromOption() === item && "bg-white border border-black"
-              }`}
+    <div class="w-full flex flex-col items-start md:items-end">
+      <div class="h-fit flex flex-row gap-2">
+        <For each={options}>
+          {(item) => (
+            <button
+              onClick={() => {
+                setFromOption(item);
+                setTo(new Date().toISOString());
+              }}
             >
-              {item}
-            </div>
-          </button>
-        )}
-      </For>
+              <div
+                class={`text-sm px-2 pb-0.5 flex justify-center items-center text-gray-600 rounded-sm ${
+                  fromOption() === item && "bg-white border border-black"
+                }`}
+              >
+                {item}
+              </div>
+            </button>
+          )}
+        </For>
+      </div>
+      <Show when={fromOption() === "C"}>
+        <div class="flex gap-4">
+          <input
+            class="text-sm font-light text-center col-span-1"
+            type="datetime-local"
+            name="date"
+            onInput={(event) =>
+              setFrom(new Date(event?.currentTarget.value).toISOString())
+            }
+            value={from()?.split(".")[0]}
+          />
+          <input
+            class="text-sm font-light text-center col-span-1"
+            type="datetime-local"
+            name="date"
+            onInput={(event) =>
+              setTo(new Date(event?.currentTarget.value).toISOString())
+            }
+            value={to()?.split(".")[0]}
+          />
+        </div>
+      </Show>
     </div>
   );
 };
