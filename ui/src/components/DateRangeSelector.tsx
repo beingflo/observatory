@@ -66,7 +66,7 @@ export const DateRangeSelector = () => {
         </For>
       </div>
       <Show when={fromOption() === "C"}>
-        <div class="flex gap-4">
+        <div class="flex flex-col md:flex-row mt-2 gap-2 md:gap-4">
           <input
             class="text-sm font-light text-center col-span-1"
             type="datetime-local"
