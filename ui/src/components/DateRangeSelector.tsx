@@ -1,5 +1,6 @@
 import { For, Show, untrack } from "solid-js";
 import { useRange } from "./RangeProvider";
+import { createShortcut } from "@solid-primitives/keyboard";
 
 export const getDate = (option: string): string => {
   const now = new Date();
@@ -32,6 +33,15 @@ export const DateRangeSelector = () => {
     useRange();
 
   const options = ["1y", "6m", "30d", "7d", "1d", "6h", "C"];
+
+  createShortcut(["ArrowLeft"], () => {
+    // TODO
+    console.log("Move time window left");
+  });
+  createShortcut(["ArrowRight"], () => {
+    // TODO
+    console.log("Move time window right");
+  });
 
   return (
     <div class="w-full flex flex-col items-start md:items-end">
