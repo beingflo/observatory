@@ -1,4 +1,4 @@
-import { For, Show, untrack } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
 import { useRange } from "./RangeProvider";
 import { createShortcut } from "@solid-primitives/keyboard";
 
@@ -27,9 +27,14 @@ export const getDate = (option: string, startDate?: Date): string => {
   return start.toISOString();
 };
 
+const trimISOString = (value: string) => value?.split(".")[0];
+
 export const DateRangeSelector = () => {
   const [{ fromOption, from, to }, { setFromOption, setFrom, setTo }] =
     useRange();
+
+  const [fromValue, setFromValue] = createSignal(trimISOString(from()));
+  const [toValue, setToValue] = createSignal(trimISOString(to()));
 
   const options = ["1y", "6m", "30d", "7d", "1d", "6h", "C"];
 
@@ -43,6 +48,9 @@ export const DateRangeSelector = () => {
     setFromOption("C");
     setTo(oldFrom.toISOString());
     setFrom(newFrom.toISOString());
+
+    setFromValue(trimISOString(newFrom.toISOString()));
+    setToValue(trimISOString(oldFrom.toISOString()));
   });
   createShortcut(["ArrowRight"], () => {
     const oldTo = new Date(to());
@@ -54,6 +62,9 @@ export const DateRangeSelector = () => {
     setFromOption("C");
     setTo(newTo.toISOString());
     setFrom(oldTo.toISOString());
+
+    setFromValue(trimISOString(oldTo.toISOString()));
+    setToValue(trimISOString(newTo.toISOString()));
   });
 
   return (
@@ -87,7 +98,7 @@ export const DateRangeSelector = () => {
             onInput={(event) =>
               setFrom(new Date(event?.currentTarget.value).toISOString())
             }
-            value={untrack(() => from()?.split(".")[0])}
+            value={fromValue()}
           />
           <input
             class="text-sm font-light text-center col-span-1"
@@ -96,7 +107,7 @@ export const DateRangeSelector = () => {
             onInput={(event) =>
               setTo(new Date(event?.currentTarget.value).toISOString())
             }
-            value={untrack(() => to()?.split(".")[0])}
+            value={toValue()}
           />
         </div>
       </Show>
