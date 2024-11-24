@@ -1,10 +1,5 @@
 import { Dashboard } from "../components/Dashboard";
-import { BarometricReadingNook } from "../elements/chart/Barometric-reading-nook";
-import { BrightnessReadingNook } from "../elements/chart/Brightness-reading-nook";
-import { CO2LivingRoom } from "../elements/chart/CO2-living-room";
-import { HumidityLaundryRoom } from "../elements/chart/Humidity-laundry-room";
-import { HumidityLivingRoom } from "../elements/chart/Humidity-living-room";
-import { TemperatureLivingRoom } from "../elements/chart/Temperature-living-room";
+import { LineChart } from "../elements/chart/LineChart";
 import { BarometricLatestReadingNook } from "../elements/status/Barometric-latest-reading-nook";
 import { BrightnessLatestReadingNook } from "../elements/status/Brightness-latest-reading-nook";
 import { CO2LatestLivingRoom } from "../elements/status/CO2-latest-living-room";
@@ -27,12 +22,42 @@ export const Home = () => {
           <BarometricLatestReadingNook />
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 md:gap-4">
-          <CO2LivingRoom />
-          <HumidityLivingRoom />
-          <HumidityLaundryRoom />
-          <TemperatureLivingRoom />
-          <BarometricReadingNook />
-          <BrightnessReadingNook />
+          <LineChart
+            bucket="co2-sensor-living-room"
+            yData={(d: any) => d.payload.co2}
+            yLabel="CO2 [ppm]"
+            title="CO2 living room"
+          />
+          <LineChart
+            bucket="co2-sensor-living-room"
+            yData={(d: any) => d.payload.temperature}
+            yLabel="Temperature [°C]"
+            title="Temperature living room"
+          />
+          <LineChart
+            bucket="co2-sensor-living-room"
+            yData={(d: any) => d.payload.humidity}
+            yLabel="Humidity [%]"
+            title="Humidity living room"
+          />
+          <LineChart
+            bucket="humidity-laundry-room"
+            yData={(d: any) => d.payload.humidity}
+            yLabel="Humidity [%]"
+            title="Humidity laundry room"
+          />
+          <LineChart
+            bucket="brightness-barometer-living-room"
+            yData={(d: any) => d.payload.pressure}
+            yLabel="pressure [hPA]"
+            title="Barometric pressure"
+          />
+          <LineChart
+            bucket="brightness-barometer-living-room"
+            yData={(d: any) => d.payload.lux}
+            yLabel="Brightness [lux]"
+            title="Brightness kitchen"
+          />
         </div>
       </div>
     </Dashboard>

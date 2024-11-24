@@ -5,15 +5,23 @@ import { Card } from "../../components/Card";
 import { useRange } from "../../components/RangeProvider";
 import { getRandomInRange } from "../../components/utils";
 
-const fetchData = async (from: string, to: string) => {
-  const response = await fetch(
-    `/api/data?bucket=co2-sensor-living-room&sample=1000&from=${from}&to=${to}`
-  );
-  return response.json();
+export type LineChartProps = {
+  bucket: string;
+  title: string;
+  yLabel: string;
+  yData: (d: object) => number;
 };
 
-export const CO2LivingRoom = () => {
+export const LineChart = (props: LineChartProps) => {
   const [{ from, to }] = useRange();
+
+  const fetchData = async (from: string, to: string) => {
+    const response = await fetch(
+      `/api/data?bucket=${props.bucket}&sample=1000&from=${from}&to=${to}`
+    );
+    return response.json();
+  };
+
   const [data, { refetch }] = createResource(
     () => [from(), to()],
     () => fetchData(from(), to())
@@ -25,23 +33,24 @@ export const CO2LivingRoom = () => {
   }, getRandomInRange(0, 30000));
 
   return (
-    <Card title="CO2 living room">
+    <Card title={props.title}>
       <Chart
-        id="co2-living-room"
-        loading={data.loading}
+        id={props.title}
+        loading={!data()}
         plot={{
           y: {
             grid: true,
-            label: "CO2 [ppm]",
+            label: props.yLabel,
           },
           x: {
             type: "time",
           },
           marks: [
-            Plot.lineY(data(), {
-              x: (d) => new Date(d.timestamp),
-              y: (d) => d.payload.co2,
-            }),
+            data() &&
+              Plot.lineY(data(), {
+                x: (d) => new Date(d.timestamp),
+                y: props.yData,
+              }),
           ],
         }}
       />
