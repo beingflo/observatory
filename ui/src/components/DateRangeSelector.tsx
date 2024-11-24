@@ -2,30 +2,29 @@ import { For, Show, untrack } from "solid-js";
 import { useRange } from "./RangeProvider";
 import { createShortcut } from "@solid-primitives/keyboard";
 
-export const getDate = (option: string): string => {
-  const now = new Date();
+const getSecondsFromOption = (option: string): number => {
   switch (option) {
     case "1y":
-      now.setMonth(now.getMonth() - 12);
-      return now.toISOString();
+      return 3600 * 24 * 30 * 12;
     case "6m":
-      now.setMonth(now.getMonth() - 6);
-      return now.toISOString();
+      return 3600 * 24 * 30 * 6;
     case "30d":
-      now.setMonth(now.getMonth() - 1);
-      return now.toISOString();
+      return 3600 * 24 * 30;
     case "7d":
-      now.setHours(now.getHours() - 168);
-      return now.toISOString();
+      return 3600 * 24 * 7;
     case "1d":
-      now.setHours(now.getHours() - 24);
-      return now.toISOString();
+      return 3600 * 24;
     case "6h":
-      now.setHours(now.getHours() - 6);
-      return now.toISOString();
+      return 3600 * 6;
   }
+  return 0;
+};
 
-  return "";
+export const getDate = (option: string, startDate?: Date): string => {
+  const start = startDate || new Date();
+  start.setSeconds(start.getSeconds() - getSecondsFromOption(option));
+
+  return start.toISOString();
 };
 
 export const DateRangeSelector = () => {
@@ -35,12 +34,26 @@ export const DateRangeSelector = () => {
   const options = ["1y", "6m", "30d", "7d", "1d", "6h", "C"];
 
   createShortcut(["ArrowLeft"], () => {
-    // TODO
-    console.log("Move time window left");
+    const oldTo = new Date(to());
+    const oldFrom = new Date(from());
+
+    let newFrom = new Date();
+    newFrom.setTime(oldFrom.getTime() - (oldTo.getTime() - oldFrom.getTime()));
+
+    setFromOption("C");
+    setTo(oldFrom.toISOString());
+    setFrom(newFrom.toISOString());
   });
   createShortcut(["ArrowRight"], () => {
-    // TODO
-    console.log("Move time window right");
+    const oldTo = new Date(to());
+    const oldFrom = new Date(from());
+
+    let newTo = new Date();
+    newTo.setTime(oldTo.getTime() + (oldTo.getTime() - oldFrom.getTime()));
+
+    setFromOption("C");
+    setTo(newTo.toISOString());
+    setFrom(oldTo.toISOString());
   });
 
   return (
