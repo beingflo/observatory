@@ -1,0 +1,32 @@
+type: http_request
+model: http_request
+id: rq_7fcM8KzoQ0
+createdAt: 2024-11-09T21:35:26
+updatedAt: 2024-11-15T15:10:49
+workspaceId: wk_ggvGsdWanE
+folderId: fl_R4ofHfJ7D8
+authentication:
+  password: ${[ PASSWORD ]}
+  username: ${[ USERNAME ]}
+authenticationType: basic
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: co2
+sortPriority: 0.0
+url: ${[ BASE_URL ]}/api/co2
+urlParameters:
+- enabled: false
+  name: from
+  value: 2024-11-11T15:02:00Z
+  id: null
+- enabled: false
+  name: to
+  value: 2024-11-03T17:02:00Z
+  id: null
+- enabled: true
+  name: ''
+  value: ''
+  id: null

@@ -1,0 +1,32 @@
+type: http_request
+model: http_request
+id: rq_XMQuqDXaKD
+createdAt: 2024-10-31T14:42:55
+updatedAt: 2024-11-09T20:34:20
+workspaceId: wk_ggvGsdWanE
+folderId: fl_afqp1BHfih
+authentication:
+  password: ${[ PASSWORD ]}
+  username: ${[ USERNAME ]}
+authenticationType: basic
+body:
+  text: |-
+    {
+      "description": "embedded-gateway"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: null
+- enabled: true
+  name: ''
+  value: ''
+  id: null
+method: POST
+name: emitter
+sortPriority: 1000.0
+url: ${[ BASE_URL ]}/api/emitter
+urlParameters: []

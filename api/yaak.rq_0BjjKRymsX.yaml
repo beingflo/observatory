@@ -1,0 +1,44 @@
+type: http_request
+model: http_request
+id: rq_0BjjKRymsX
+createdAt: 2024-10-04T13:30:58
+updatedAt: 2024-11-13T20:54:16
+workspaceId: wk_ggvGsdWanE
+folderId: fl_JHB8gpciq9
+authentication:
+  password: ${[ PASSWORD ]}
+  username: ${[ USERNAME ]}
+authenticationType: basic
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: DELETE
+name: data
+sortPriority: 1000.0
+url: ${[ BASE_URL ]}/api/data
+urlParameters:
+- enabled: true
+  name: bucket
+  value: CAREFUL
+  id: null
+- enabled: false
+  name: to
+  value: 2024-11-13T18:59:38.472708Z
+  id: null
+- enabled: false
+  name: from
+  value: 2024-11-13T18:39:51.135811Z
+  id: null
+- enabled: false
+  name: limit
+  value: '40'
+  id: null
+- enabled: false
+  name: past_days
+  value: '1'
+  id: null
+- enabled: true
+  name: ''
+  value: ''
+  id: null

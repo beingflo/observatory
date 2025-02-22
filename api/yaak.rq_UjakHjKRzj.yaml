@@ -1,0 +1,40 @@
+type: http_request
+model: http_request
+id: rq_UjakHjKRzj
+createdAt: 2024-10-04T13:34:53
+updatedAt: 2024-11-03T16:35:10
+workspaceId: wk_ggvGsdWanE
+folderId: fl_JHB8gpciq9
+authentication:
+  password: test
+  username: florian
+authenticationType: null
+body:
+  text: |-
+    {
+      "bucket": "weight-florian",
+      "timestamp": "2024-10-05T18:00:00+02:00",
+      "payload": {
+        "weight": 94.6
+      }
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: null
+- enabled: true
+  name: emitter
+  value: 9Mu6lZEZ87n4DWtflMgiBqGVzaQRRM5CKus366Zo5KLi9qagCST8OlleFSiUgv8K
+  id: null
+- enabled: true
+  name: ''
+  value: ''
+  id: null
+method: POST
+name: data (ts)
+sortPriority: 4000.0
+url: ${[ BASE_URL ]}/api/data
+urlParameters: []

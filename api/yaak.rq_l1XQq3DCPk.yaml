@@ -1,0 +1,29 @@
+type: http_request
+model: http_request
+id: rq_l1XQq3DCPk
+createdAt: 2024-11-03T13:06:47
+updatedAt: 2024-11-03T13:07:28
+workspaceId: wk_ggvGsdWanE
+folderId: fl_afqp1BHfih
+authentication:
+  password: ${[ PASSWORD ]}
+  username: ${[ USERNAME ]}
+authenticationType: basic
+body:
+  text: ''
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: null
+- enabled: true
+  name: ''
+  value: ''
+  id: null
+method: GET
+name: emitter
+sortPriority: 0.0
+url: ${[ BASE_URL ]}/api/emitter
+urlParameters: []

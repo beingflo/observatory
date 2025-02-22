@@ -1,0 +1,57 @@
+type: http_request
+model: http_request
+id: rq_8lGw2biNm7
+createdAt: 2024-10-04T13:36:28
+updatedAt: 2024-11-03T12:27:16
+workspaceId: wk_ggvGsdWanE
+folderId: fl_LwpuZ4I4ZS
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "locations": [
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              8.5111799,
+              47.3778839
+            ]
+          },
+          "properties": {
+            "speed": 1,
+            "battery_state": "unplugged",
+            "motion": [
+              "walking"
+            ],
+            "timestamp": "2025-10-01T10:00:17.2Z",
+            "battery_level": 0.85,
+            "speed_accuracy": 1.21,
+            "horizontal_accuracy": 17,
+            "vertical_accuracy": 4,
+            "wifi": "",
+            "course": 169,
+            "altitude": 412,
+            "course_accuracy": 88.71
+          }
+        }
+      ]
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: null
+- enabled: true
+  name: ''
+  value: ''
+  id: null
+method: POST
+name: gps
+sortPriority: -1728048700000.0
+url: ${[ BASE_URL ]}/api/gps/4khTpFgJelUHyppNHqB9NWDPgyvpmC1dtsQ4pkyIbUxguVmcihbU4oHZVzqjY7jT/location_florian2
+urlParameters: []

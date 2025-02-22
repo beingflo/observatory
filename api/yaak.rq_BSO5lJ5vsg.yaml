@@ -1,0 +1,27 @@
+type: http_request
+model: http_request
+id: rq_BSO5lJ5vsg
+createdAt: 2024-10-31T15:36:52
+updatedAt: 2024-11-03T15:52:45
+workspaceId: wk_ggvGsdWanE
+folderId: fl_JHB8gpciq9
+authentication: {}
+authenticationType: null
+body:
+  text: ''
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: null
+- enabled: true
+  name: ''
+  value: ''
+  id: null
+method: POST
+name: data (url)
+sortPriority: 3000.0
+url: ${[ BASE_URL ]}/api/data/CSkOf8Djc9fkVYNtpqW6GSnVen0sDsxSh2jikCa9r9IobeCM4W9m07pde4H65BfB/weight?weight=95&x=test
+urlParameters: []

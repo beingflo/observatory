@@ -1,0 +1,36 @@
+type: http_request
+model: http_request
+id: rq_JZT1mxHpH6
+createdAt: 2024-10-04T13:36:47
+updatedAt: 2024-11-18T21:24:05
+workspaceId: wk_ggvGsdWanE
+folderId: fl_LwpuZ4I4ZS
+authentication:
+  password: ${[ PASSWORD ]}
+  username: ${[ USERNAME ]}
+authenticationType: basic
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: gps
+sortPriority: -1728048700000.0
+url: ${[ BASE_URL ]}/api/gps/location_florian
+urlParameters:
+- enabled: false
+  name: from
+  value: 2024-11-16T11:59:38.472708Z
+  id: null
+- enabled: false
+  name: to
+  value: 2024-11-16T11:59:38.472708Z
+  id: null
+- enabled: true
+  name: limit
+  value: '10'
+  id: null
+- enabled: true
+  name: ''
+  value: ''
+  id: null
