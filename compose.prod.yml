@@ -4,7 +4,7 @@ services:
     container_name: observatory
     env_file: ".env.prod"
     volumes:
-      - /home/florian/observatory/db:/usr/src/app/db/
+      - observatory-db:/usr/src/app/db/
     restart: unless-stopped
     networks:
       - caddy_net
@@ -12,3 +12,7 @@ services:
 networks:
   caddy_net:
     external: true
+
+volumes:
+  observatory-db:
+    name: "observatory-db"
