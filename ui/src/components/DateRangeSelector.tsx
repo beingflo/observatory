@@ -1,4 +1,4 @@
-import { createSignal, For, Show } from "solid-js";
+import { batch, createSignal, For, Show } from "solid-js";
 import { useRange } from "./RangeProvider";
 import { createShortcut } from "@solid-primitives/keyboard";
 
@@ -74,8 +74,10 @@ export const DateRangeSelector = () => {
           {(item) => (
             <button
               onClick={() => {
-                setFromOption(item);
-                setTo(new Date().toISOString());
+                batch(() => {
+                  setFromOption(item);
+                  setTo(new Date().toISOString());
+                });
               }}
             >
               <div
