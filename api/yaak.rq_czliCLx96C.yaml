@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_czliCLx96C
 createdAt: 2024-10-04T13:34:13
-updatedAt: 2024-11-07T07:09:37
+updatedAt: 2025-05-29T20:12:09.532385
 workspaceId: wk_ggvGsdWanE
 folderId: fl_JHB8gpciq9
 authentication:
@@ -12,10 +12,8 @@ authenticationType: null
 body:
   text: |-
     {
-      "bucket": "weight-florian",
-      "payload": {
-        "weight": 95.0
-      }
+      "bucket": "badi-tracker",
+      "payload": [{"uid":"IMBAD-1","name":"Adliswil","freespace":2000,"maxspace":2000,"currentfill":"0"},{"uid":"WEYERMANNSHAUS-1","name":"Bern","freespace":3450,"maxspace":3500,"currentfill":"50"},{"uid":"MARZILI-1","name":"Bern","freespace":14794,"maxspace":14999,"currentfill":"205"},{"uid":"WYLERBAD-1","name":"Bern","freespace":2983,"maxspace":3000,"currentfill":"17"},{"uid":"BADI-1","name":"Enge","freespace":29,"maxspace":50,"currentfill":"21"},{"uid":"FREIBAD-1","name":"Entfelden","freespace":1300,"maxspace":1300,"currentfill":"0"},{"uid":"flb6939","name":"Flussbad Oberer Letten","freespace":1488,"maxspace":1500,"currentfill":"12"},{"uid":"flb6940","name":"Flussbad Unterer Letten","freespace":-10,"maxspace":0,"currentfill":"10"},{"uid":"flb8803","name":"Flussbad Unterer Letten (Flussteil)","freespace":-1,"maxspace":0,"currentfill":"1"},{"uid":"flb6941","name":"Frauenbad Stadthausquai","freespace":-94,"maxspace":0,"currentfill":"94"},{"uid":"fb006","name":"Freibad Allenmoos","freespace":4,"maxspace":5,"currentfill":"1"},{"uid":"fb008","name":"Freibad Auhof","freespace":0,"maxspace":0,"currentfill":"0"},{"uid":"fb012","name":"Freibad Heuried","freespace":-8,"maxspace":0,"currentfill":"8"},{"uid":"LETZI-1","name":"Freibad Letzigraben","freespace":-1,"maxspace":0,"currentfill":"1"},{"uid":"SSD-11","name":"Freibad Seebach","freespace":1991,"maxspace":2000,"currentfill":"9"},{"uid":"fb018","name":"Freibad Zwischen den H\u00F6lzern","freespace":-9,"maxspace":0,"currentfill":"9"},{"uid":"SSD-1","name":"Hallenbad Altstetten","freespace":0,"maxspace":0,"currentfill":"0"},{"uid":"SSD-2","name":"Hallenbad Blaesi","freespace":123456,"maxspace":123456,"currentfill":"0"},{"uid":"SSD-3","name":"Hallenbad Bungertwies","freespace":100,"maxspace":100,"currentfill":"0"},{"uid":"SSD-4","name":"Hallenbad City","freespace":200,"maxspace":200,"currentfill":"0"},{"uid":"SSD-6","name":"Hallenbad Leimbach","freespace":398,"maxspace":400,"currentfill":"2"},{"uid":"SSD-7","name":"Hallenbad Oerlikon","freespace":1000,"maxspace":1000,"currentfill":"0"},{"uid":"SSD-8","name":"Josel-Areal","freespace":192,"maxspace":200,"currentfill":"8"},{"uid":"LIDO-1","name":"Luzern","freespace":3500,"maxspace":3500,"currentfill":"0"},{"uid":"RISCH-1","name":"Rotkreuz","freespace":597,"maxspace":600,"currentfill":"3"},{"uid":"SSD-10","name":"Seebad Utoquai","freespace":36,"maxspace":100,"currentfill":"64"},{"uid":"seb6946","name":"Strandbad Mythenquai","freespace":0,"maxspace":0,"currentfill":"0"},{"uid":"seb6947","name":"Strandbad Tiefenbrunnen","freespace":0,"maxspace":0,"currentfill":"0"},{"uid":"seb6948","name":"Strandbad Wollishofen","freespace":-1,"maxspace":0,"currentfill":"1"},{"uid":"SSD-5","name":"Waermebad Kaeferberg","freespace":60,"maxspace":60,"currentfill":"0"},{"uid":"WEN-1","name":"Wengen","freespace":70,"maxspace":70,"currentfill":"0"},{"uid":"HUENENBERG-1","name":"Zug","freespace":1000,"maxspace":1000,"currentfill":"0"}]
     }
 bodyType: application/json
 description: ''

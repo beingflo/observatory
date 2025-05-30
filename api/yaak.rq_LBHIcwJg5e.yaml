@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_LBHIcwJg5e
 createdAt: 2024-10-05T20:57:48
-updatedAt: 2024-11-16T09:59:38
+updatedAt: 2025-05-30T20:50:14.218881
 workspaceId: wk_ggvGsdWanE
 folderId: fl_JHB8gpciq9
 authentication:
@@ -28,29 +28,29 @@ url: ${[ BASE_URL ]}/api/data
 urlParameters:
 - enabled: true
   name: bucket
-  value: location_florian
-  id: null
+  value: heuried-visitors
+  id: kjQpzsPVS9
 - enabled: false
   name: to
   value: 2024-11-14T11:59:38.472708Z
-  id: null
+  id: 3UgT82iIW4
 - enabled: false
   name: from
   value: 2024-11-13T18:39:51.135811Z
-  id: null
+  id: 4Q8iVhhtxN
 - enabled: false
   name: sample
   value: '100'
-  id: null
-- enabled: true
+  id: AVkIGtkqTX
+- enabled: false
   name: limit
   value: '1000'
-  id: null
+  id: IvjJbySXeE
 - enabled: false
   name: past_days
   value: '30'
-  id: null
+  id: K4NfpNfMeW
 - enabled: true
   name: ''
   value: ''
-  id: null
+  id: Wsjaa3Jhp9

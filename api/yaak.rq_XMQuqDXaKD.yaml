@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_XMQuqDXaKD
 createdAt: 2024-10-31T14:42:55
-updatedAt: 2024-11-09T20:34:20
+updatedAt: 2025-05-29T21:15:27.832058
 workspaceId: wk_ggvGsdWanE
 folderId: fl_afqp1BHfih
 authentication:
@@ -12,7 +12,7 @@ authenticationType: basic
 body:
   text: |-
     {
-      "description": "embedded-gateway"
+      "description": "badi-tracker"
     }
 bodyType: application/json
 description: ''

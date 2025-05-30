@@ -7,4 +7,8 @@ export const dashboards = [
     title: "Location",
     target: "/location",
   },
+  {
+    title: "Heuried",
+    target: "/heuried",
+  },
 ];

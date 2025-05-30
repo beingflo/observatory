@@ -8,6 +8,7 @@ import Weight from "./dashboards/Weight";
 import { Home } from "./dashboards/Home";
 import { RangeProvider } from "./components/RangeProvider";
 import { Location } from "./dashboards/Location";
+import { Heuried } from "./dashboards/Heuried";
 
 const root = document.getElementById("root");
 
@@ -19,6 +20,7 @@ render(
         <Route path="/home" component={Home} />
         <Route path="/location" component={Location} />
         <Route path="/weight" component={Weight} />
+        <Route path="/heuried" component={Heuried} />
       </Router>
     </RangeProvider>
   ),
